@@ -1,0 +1,290 @@
+---
+title: "Data Wrangling"
+subtitle: "Working with Data in R & Introduction to Dplyr"
+author: "Melinda Higgins"
+date: "Emory University </br> 02/10/2021"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["default", "css/middleburymkh.css", "css/middleburymkh-fonts.css"]
+    nature:
+      beforeInit: ["midd_xaringan.js"]
+      highlightStyle: gruvbox-light
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "middlebury_header.html"
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+# For htmltools package, you may set options(htmltools.dir.version = FALSE) to suppress the version number in the subdirectory name.
+options(htmltools.dir.version = FALSE)
+library(knitr)
+library(dplyr)
+```
+
+background-size: 100%
+background-image: url(img/data_cowboy.png)
+background-position: 70% 70%
+class: center, top
+
+# Become a Data Wrangler!
+
+.footnote[
+* Illustrations by Allison Horst, RStudio Artist in Residence, <https://github.com/allisonhorst/stats-illustrations>
+]
+
+---
+
+# What's in My Dataset?
+
+* `str()` see structure of data
+* `head()` and `tail()` functions
+* `names()` list variable names in dataset
+* numerical data - use `summary()`
+* categorical variable or factors - use `table()`
+
+---
+
+# Palmer Penguins Data - Structure
+
+1. Load palmerpenguins package
+2. See structure of data
+
+```{r}
+library(palmerpenguins)
+str(penguins)
+```
+
+---
+
+# Palmer Penguins Data - "Peek" at Data
+
+1. See top and bottoms rows of data
+2. Use `head()` function
+
+```{r}
+head(penguins)
+```
+
+Notice we cannot "see" all of the data - some columns hidden? The data is in a `tibble` data "class"
+
+```{r}
+class(penguins)
+```
+
+---
+
+# Look at more rows - bottom 10 rows
+
+Add the number 10 to the `tail()` function.
+
+```{r}
+tail(penguins, 10)
+```
+
+From `help(tail)` page:
+
+```
+## S3 method for class 'function'
+tail(x, n = 6L, ...)
+```
+---
+
+# Convert from a `tibble` to a plain `data.frame`
+
+We can convert this to a plain `data.frame` class and then look at the complete data.
+
+```{r}
+penguins.df <- data.frame(penguins)
+class(penguins.df)
+head(penguins.df)
+```
+
+---
+
+# Using `dplyr` - functions are verbs
+
+Let's `pull()` out one variable (column) `bill_length_mm` from the `penguins` dataset and then get the `mean()`.
+
+We will use the pipe operator `%>%` from `dplyr` to chain our programming steps together in a logical order.
+
+```{r}
+penguins %>%
+  pull(bill_length_mm) %>%
+  mean()
+```
+
+Try again - add `na.rm=TRUE` option to the `mean()` function find the mean of all of the non-missing (not `NA`) values.
+
+```{r}
+penguins %>%
+  pull(bill_length_mm) %>%
+  mean(na.rm = TRUE)
+```
+
+.footnote[
+Learn more at [https://dplyr.tidyverse.org/](https://dplyr.tidyverse.org/).
+]
+
+---
+
+# The Base R way to do the same thing
+
+```{r}
+mean(penguins$bill_length_mm, na.rm = TRUE)
+```
+
+--
+
+This is processed similar to the previous slide, but now we have to look from the inside out. 
+
+--
+
+The `$` operator selects the `bill_length_mm` variable in the `penguins` dataset.
+
+--
+
+This is fed into the `mean()` function as the column vector of data we want to find the mean for.
+
+--
+
+And then we also add the `na.rm = TRUE` option to the `mean()` function.
+
+--
+
+.footnote[I like `dplyr` better. But knowing the base R way is good also.]
+
+---
+
+# Choose more than 1 variable with `select()`
+
+Let's get `summary()` statistics for `body_mass_g` and `flipper_length_mm`
+
+```{r}
+penguins %>%
+  select(body_mass_g, flipper_length_mm) %>%
+  summary()
+```
+
+The `summary()` function is a useful base R function - I just wish it gave you standard deviation!!!
+
+---
+
+# Create custom statistics output
+
+The `summarise()` function from `dplyr` will let you create custom statistical summaries.
+
+```{r}
+penguins %>%
+  select(body_mass_g, flipper_length_mm) %>%
+  summarise(
+    body_mean = mean(body_mass_g, na.rm=TRUE),
+    body_sd = sd(body_mass_g, na.rm=TRUE),
+    flip_mean = mean(flipper_length_mm, na.rm=TRUE),
+    flip_sd = sd(flipper_length_mm, na.rm=TRUE)
+  )
+```
+
+---
+
+# Use `group_by()` to further improve your output
+
+Let's get the same output but now grouped by `species.` Notice we added `species` to the `select()` list of variables.
+
+```{r}
+penguins %>%
+  select(body_mass_g, flipper_length_mm, species) %>%
+  group_by(species) %>% #<<
+  summarise(
+    body_mean = mean(body_mass_g, na.rm=TRUE),
+    body_sd = sd(body_mass_g, na.rm=TRUE),
+    flip_mean = mean(flipper_length_mm, na.rm=TRUE),
+    flip_sd = sd(flipper_length_mm, na.rm=TRUE)
+  )
+```
+
+---
+
+# Use `knitr::kable()` for pretty output table
+
+Use `knitr::kable()` on any table, data.frame, matrix or tibble to get pretty output.
+
+```{r}
+penguins %>%
+  select(body_mass_g, flipper_length_mm, species) %>%
+  group_by(species) %>%
+  summarise(
+    body_mean = mean(body_mass_g, na.rm=TRUE),
+    body_sd = sd(body_mass_g, na.rm=TRUE),
+    flip_mean = mean(flipper_length_mm, na.rm=TRUE),
+    flip_sd = sd(flipper_length_mm, na.rm=TRUE)
+  ) %>%
+  knitr::kable() #<<
+```
+
+---
+
+# `knitr::kable()` - add better column headings
+
+Use `knitr::kable()` on any table, data.frame, matrix or tibble to get pretty output.
+
+```{r}
+penguins %>%
+  select(body_mass_g, flipper_length_mm, species) %>%
+  group_by(species) %>%
+  summarise(
+    body_mean = mean(body_mass_g, na.rm=TRUE),
+    body_sd = sd(body_mass_g, na.rm=TRUE),
+    flip_mean = mean(flipper_length_mm, na.rm=TRUE),
+    flip_sd = sd(flipper_length_mm, na.rm=TRUE)
+  ) %>%
+  knitr::kable(col.names = c("Species", #<<
+                             "Mean Body Mass (g)", #<<
+                             "SD of Body Mass (g)", #<<
+                             "Mean Flipper Length (mm)", #<<
+                             "SD of Flipper Length (mm)")) #<<
+```
+
+---
+
+```{r out.width = '=100%', echo=FALSE}
+knitr::include_graphics("img/dplyr_filter.jpg")
+```
+
+---
+
+# Using `dplyr::filter()` to select cases (rows)
+
+Get summary statistics for the Chinstrap penguins
+
+```{r}
+penguins %>%
+  filter(species == "Chinstrap") %>% #<<
+  summary()
+```
+
+---
+
+```{r out.width = '75%', echo=FALSE}
+knitr::include_graphics("img/dplyr_mutate.png")
+```
+
+---
+
+# `dplyr::mutate()` to make new variables
+
+The body_mass_g is currently in grams. Let's create a new variable for the mass in kg. Save the updated dataset as `penguins.mod`.
+
+```{r}
+penguins.mod <- penguins %>%
+  mutate(body_mass_kg = body_mass_g / 1000)
+
+penguins.mod %>%
+  select(body_mass_g, body_mass_kg) %>%
+  head()
+  
+```
+

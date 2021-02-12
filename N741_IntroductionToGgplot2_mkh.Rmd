@@ -1,0 +1,47 @@
+---
+title: "Ggplot2"
+subtitle: "Building graphics one layer at a time!"
+author: "Melinda Higgins"
+date: "Emory University </br> 02/11/2021"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["default", "css/middleburymkh.css", "css/middleburymkh-fonts.css", "css/sidecodeplot.css"]
+    nature:
+      beforeInit: ["midd_xaringan.js"]
+      highlightStyle: gruvbox-light
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "middlebury_header.html"
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+# For htmltools package, you may set options(htmltools.dir.version = FALSE) to suppress the version number in the subdirectory name.
+options(htmltools.dir.version = FALSE)
+
+library(knitr)
+library(dplyr)
+library(ggplot2)
+```
+
+
+
+.left-code[
+```{r plot-label, eval=FALSE}
+# code chunk here
+ggplot(iris) + 
+  aes(Sepal.Length, 
+      Sepal.Width, 
+      color = Species) + 
+  geom_point()  #<<
+```
+]
+
+.right-plot[
+```{r plot-label-out, ref.label="plot-label", echo=FALSE, fig.dim=c(4.8, 4.5), out.width="100%"}
+```
+]
+

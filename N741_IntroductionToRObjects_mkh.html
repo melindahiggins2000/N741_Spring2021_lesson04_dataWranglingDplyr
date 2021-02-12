@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>R Objects</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Melinda Higgins" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+    <link rel="stylesheet" href="css/middleburymkh.css" type="text/css" />
+    <link rel="stylesheet" href="css/middleburymkh-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="css/sidecodeplot.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# R Objects
+## Everything in R is an object
+### Melinda Higgins
+### Emory University </br> 02/11/2021
+
+---
+
+
+
+# Everything in R is captured as an "object"
+
+When you type a simple equation `2+2` in the **Console** it is "saved" in temporary memory as an "object".
+
+
+```r
+2 + 2
+```
+
+```
+## [1] 4
+```
+
+--
+
+To "recall" this value saved in temporary memore, we can call `.Last.value` which is the object where the value `4` is saved.
+
+
+```r
+.Last.value
+```
+
+```
+[1] 4
+```
+
+---
+
+# **ASSIGN** your results to an "object", use .big[**&lt;-**] 
+
+.pull-left[
+
+Using `.Last.value` is inefficient, so we need to save/store this value in an object. An object is a text string we use to retrieve the value (or elements) we saved. Let's save the results of `2+2` in an object `result`.
+
+For this we will use the **ASSIGN** operator .big[**`&lt;-`**].
+
+
+```r
+result &lt;- 2+2
+```
+]
+
+--
+
+.pull-right[
+
+This is saved now in your "Global Environment". To retrieve this value, simply type the text string `result` to see the value `4`.
+
+
+```r
+result
+```
+
+```
+## [1] 4
+```
+
+]
+
+--
+
+.pull-right[
+![globalenv](img/results4_globalenvironment.jpg)
+]
+
+---
+
+# Object Types
+
+Use `class()` function to find out what the object type is.
+
+.pull-left[
+Numeric
+
+
+```r
+x &lt;- 3.1415
+class(x)
+```
+
+```
+## [1] "numeric"
+```
+
+Character
+
+
+```r
+favsnack &lt;- "hummus"
+class(favsnack)
+```
+
+```
+## [1] "character"
+```
+
+Logical - directly assigned (no quotes, ALL CAPS)
+
+
+```r
+likebeets &lt;- TRUE
+class(likebeets)
+```
+
+```
+## [1] "logical"
+```
+]
+
+--
+
+.pull-right[
+
+Get responses: 1=No, 2=Yes
+
+
+```r
+beetchoice &lt;- c(1,1,2,2,1)
+class(beetchoice)
+```
+
+```
+## [1] "numeric"
+```
+
+Logical - as result of a "test". Notice the use of the logical operator `==`.
+
+
+```r
+likebeets &lt;- beetchoice == 2
+likebeets
+```
+
+```
+## [1] FALSE FALSE  TRUE  TRUE FALSE
+```
+
+```r
+class(likebeets)
+```
+
+```
+## [1] "logical"
+```
+
+]
+
+---
+
+![objectTypes](img/damariszurell.github.io_DataStructures.jpg)
+
+---
+
+# Object Type Scalar - single values
+
+Scalar - one value (numeric or text)
+
+
+```r
+x &lt;- 3.1415
+class(x)
+```
+
+```
+## [1] "numeric"
+```
+
+--
+
+
+```r
+y &lt;- "brocalli"
+class(y)
+```
+
+```
+## [1] "character"
+```
+
+--
+
+
+```r
+z &lt;- FALSE
+class(z)
+```
+
+```
+## [1] "logical"
+```
+
+--
+
+To see what is in an object, just type the name.
+
+
+```r
+y
+```
+
+```
+## [1] "brocalli"
+```
+
+
+---
+
+# Object type Vector
+
+.pull-left[
+A vector is multiple values combined `c()` of same type
+
+
+```r
+w &lt;- c(3.1415, 6.626E-34, 343)
+class(w)
+```
+
+```
+## [1] "numeric"
+```
+
+```r
+v &lt;- c("brocalli","spinach","carrots")
+class(v)
+```
+
+```
+## [1] "character"
+```
+
+Confirm these are vectors with `is.vector()`
+
+
+```r
+is.vector(w)
+```
+
+```
+## [1] TRUE
+```
+]
+
+--
+
+.pull-right[
+
+Vectors are only 1-dimensional - only 1 row or 1 column. We can get how long they are (number of elements) using `length()`.
+
+
+```r
+length(v)
+```
+
+```
+## [1] 3
+```
+
+**Pick an element:** To see a specific element of a vector use square brackets `[]`'s to specify the index of that element. For example, let's view the 2nd element of `v`.
+
+
+```r
+v[2]
+```
+
+```
+## [1] "spinach"
+```
+
+]
+
+---
+
+# Mixing data types
+
+.pull-left[
+
+```r
+class(x)
+```
+
+```
+## [1] "numeric"
+```
+
+```r
+class(y)
+```
+
+```
+## [1] "character"
+```
+
+```r
+class(z)
+```
+
+```
+## [1] "logical"
+```
+
+What happens if we combine different data types?
+]
+
+--
+
+.pull-right[
+Combine `x` (numeric) and `y` (character)
+
+
+```r
+xy &lt;- c(x,y)
+xy
+```
+
+```
+## [1] "3.1415"   "brocalli"
+```
+
+Why does 3.1415 have `"`'s around it?
+
+
+```r
+class(xy)
+```
+
+```
+## [1] "character"
+```
+
+By mixing numeric and character values R chooses a data type that will best retain ALL of the values. "3.1415" is now the string of characters that represent that number.
+]
+
+---
+
+# Thinking exercise
+
+Combine `x` (numeric) and `z` (logical) - what do you get?
+
+--
+
+
+```r
+xz &lt;- c(x,z)
+xz
+```
+
+```
+## [1] 3.1415 0.0000
+```
+
+Why is the second value 0?
+
+--
+
+
+```r
+class(xz)
+```
+
+```
+## [1] "numeric"
+```
+
+It turns out that the logical values of `TRUE` and `FALSE` can be represented as the numbers 1 (for `TRUE`) and 0 (for `FALSE`). Thus `FALSE` was converted to 0 so we have combined numeric values.
+
+---
+
+# Thinking Exercise
+
+Combine `y` (character) and `z` (logical) - what do you get?
+
+--
+
+
+```r
+yz &lt;- c(y,z)
+yz
+```
+
+```
+## [1] "brocalli" "FALSE"
+```
+
+Notice that `"FALSE"` has `"`'s around it.
+
+--
+
+
+```r
+class(yz)
+```
+
+```
+## [1] "character"
+```
+
+Even though `FALSE` can convert to a numeric value of 0, when combined with character values, it is also converted to a string of characters that represent the word `"FALSE"`
+
+---
+
+# Matrix - 2-dimensional combination of same type
+
+.pull-left[
+
+Use `matrix()` function
+
+
+```r
+X &lt;- c(1, 2, 3, 4, 5)
+Y &lt;- c(23, 34, 32, 21, 28)
+Z &lt;- c(4.4, 3.0, 3.4, 2.2, 3.8)
+mtx &lt;- matrix(c(X,Y,Z), nrow=5, ncol=3)
+mtx
+```
+
+```
+##      [,1] [,2] [,3]
+## [1,]    1   23  4.4
+## [2,]    2   34  3.0
+## [3,]    3   32  3.4
+## [4,]    4   21  2.2
+## [5,]    5   28  3.8
+```
+
+```r
+class(mtx)
+```
+
+```
+## [1] "matrix" "array"
+```
+
+]
+
+--
+
+.pull-right[
+
+Get dimensions using `dim()`
+
+
+```r
+dim(mtx)
+```
+
+```
+## [1] 5 3
+```
+
+**Pick an element:** Notice there are 2 dimensions. So, if we want to see the data at ROW=2 and COLUMN=3, we  use `[]` to select specific [ROW, COLUMN].
+
+
+```r
+mtx[2, 3]
+```
+
+```
+## [1] 3
+```
+]
+
+---
+
+# Matrix - select a whole row or a column
+
+.pull-left[
+### Display Matrix `mtx`
+
+
+```r
+mtx
+```
+
+```
+##      [,1] [,2] [,3]
+## [1,]    1   23  4.4
+## [2,]    2   34  3.0
+## [3,]    3   32  3.4
+## [4,]    4   21  2.2
+## [5,]    5   28  3.8
+```
+]
+
+--
+
+.pull-right[
+**Pick a row:** We can pick row 4 by leaving the column index blank.
+
+
+```r
+mtx[4, ] # 4th row of the matrix
+```
+
+```
+## [1]  4.0 21.0  2.2
+```
+
+**Pick a column:** We can pick row 4 by leaving the column index blank and pick column 3 by leaving the row index blank.
+
+
+```r
+mtx[, 3] # 3rd column of the matrix
+```
+
+```
+## [1] 4.4 3.0 3.4 2.2 3.8
+```
+
+]
+---
+
+# Can I add a different data type to a Matrix?
+
+.pull-left[
+
+```r
+A &lt;- c("apple","banana","grapes","apple","orange")
+mtx2 &lt;- matrix(c(X,Y,Z,A), nrow=5, ncol=4)
+mtx2
+```
+
+```
+##      [,1] [,2] [,3]  [,4]    
+## [1,] "1"  "23" "4.4" "apple" 
+## [2,] "2"  "34" "3"   "banana"
+## [3,] "3"  "32" "3.4" "grapes"
+## [4,] "4"  "21" "2.2" "apple" 
+## [5,] "5"  "28" "3.8" "orange"
+```
+
+Why are there `"`'s?
+
+]
+
+--
+
+.pull-right[
+The first matrix `mtx` was numeric.
+
+
+```r
+is.numeric(mtx)
+```
+
+```
+## [1] TRUE
+```
+
+But adding `A` to `mtx2` made everything character!!
+
+
+```r
+is.numeric(mtx2)
+```
+
+```
+## [1] FALSE
+```
+
+```r
+is.character(mtx2)
+```
+
+```
+## [1] TRUE
+```
+]
+
+--
+
+.footnote[So how the heck do I combine different data types?]
+
+---
+
+# Data Frame - same # rows, diffierent column types
+
+.pull-left[
+
+Create using `data.frame()` function
+
+
+```r
+id &lt;- c(1, 2, 3, 4, 5)
+age &lt;- c(23, 34, 32, 21, 28)
+fruit &lt;- c("apple","banana","grapes",
+           "apple","orange")
+beets &lt;- c(TRUE,FALSE,FALSE,TRUE,FALSE)
+df &lt;- data.frame(id, age, fruit, beets)
+df
+```
+
+```
+##   id age  fruit beets
+## 1  1  23  apple  TRUE
+## 2  2  34 banana FALSE
+## 3  3  32 grapes FALSE
+## 4  4  21  apple  TRUE
+## 5  5  28 orange FALSE
+```
+]
+
+--
+
+.pull-right[
+See column (variable) names, `names()`
+
+
+```r
+names(df)
+```
+
+```
+## [1] "id"    "age"   "fruit" "beets"
+```
+
+Get dimension, `dim()`
+
+
+```r
+dim(df)
+```
+
+```
+## [1] 5 4
+```
+
+See structure, `str()`
+
+
+```r
+str(df)
+```
+
+```
+## 'data.frame':	5 obs. of  4 variables:
+##  $ id   : num  1 2 3 4 5
+##  $ age  : num  23 34 32 21 28
+##  $ fruit: chr  "apple" "banana" "grapes" "apple" ...
+##  $ beets: logi  TRUE FALSE FALSE TRUE FALSE
+```
+
+]
+
+---
+
+# Data Frame - Select elements, rows, columns 
+
+.pull-left[
+### Using [ , ] index selector
+
+Just like matrices, we can select element using the [row, column] index notation.
+
+
+```r
+df[2, 4] # value at 2nd row, 4th column
+```
+
+```
+## [1] FALSE
+```
+
+```r
+df[1, ] # all data on row 1
+```
+
+```
+##   id age fruit beets
+## 1  1  23 apple  TRUE
+```
+
+```r
+df[, 4] # all data in column 4
+```
+
+```
+## [1]  TRUE FALSE FALSE  TRUE FALSE
+```
+]
+
+--
+
+.pull-right[
+### Using $ selector
+
+However, columns in data frames can also be selected by their column names using the .big[`$`] selector.
+
+Column names:
+
+
+```r
+names(df)
+```
+
+```
+## [1] "id"    "age"   "fruit" "beets"
+```
+
+Show the `fruit` column (variable) values.
+
+
+```r
+df$fruit
+```
+
+```
+## [1] "apple"  "banana" "grapes" "apple"  "orange"
+```
+
+]
+
+--
+
+.footnote[And we will learn a few more ways using `dplyr`]
+---
+
+# Lists are Unstructured and Useful!
+
+.pull-left[
+
+While data frames are tidy rectangular structures with exact rows and columns, often real data is messy. It can be handy to combine multiple types of data structures together. R uses **lists** for this.
+
+List can have different objects types combined.
+
+
+```r
+# combine 
+# x = scalar numeric vale
+# age = numeric vector
+# mtx = numeric matrix
+# df = data frame with mixed variable types
+list1 &lt;- list(x, age, mtx, df)
+```
+]
+
+--
+
+.pull-right[
+
+```r
+list1
+```
+
+```
+## [[1]]
+## [1] 3.1415
+## 
+## [[2]]
+## [1] 23 34 32 21 28
+## 
+## [[3]]
+##      [,1] [,2] [,3]
+## [1,]    1   23  4.4
+## [2,]    2   34  3.0
+## [3,]    3   32  3.4
+## [4,]    4   21  2.2
+## [5,]    5   28  3.8
+## 
+## [[4]]
+##   id age  fruit beets
+## 1  1  23  apple  TRUE
+## 2  2  34 banana FALSE
+## 3  3  32 grapes FALSE
+## 4  4  21  apple  TRUE
+## 5  5  28 orange FALSE
+```
+]
+
+--
+
+.footnote[This may not seem useful now, but it will be handy later on... We'll discuss these more later.]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="midd_xaringan.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "gruvbox-light",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

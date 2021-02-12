@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>R Objects - Factors</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Melinda Higgins" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+    <link rel="stylesheet" href="css/middleburymkh.css" type="text/css" />
+    <link rel="stylesheet" href="css/middleburymkh-fonts.css" type="text/css" />
+    <link rel="stylesheet" href="css/sidecodeplot.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# R Objects - Factors
+## How to work with numbers and text together
+### Melinda Higgins
+### Emory University </br> 02/11/2021
+
+---
+
+
+
+# Numeric Data in R
+
+.pull-left[
+
+&lt;img src="img/continuous_discrete.png" width="100%" /&gt;
+]
+
+.pull-right[
+### CONTINUOUS - numeric (double)
+    
+
+```r
+x &lt;- c(1.12, 1.13, 4.23)
+class(x)
+```
+
+```
+## [1] "numeric"
+```
+
+### DISCRETE - integer
+
+
+```r
+y &lt;- as.integer(c(1,2,3,4))
+class(y)
+```
+
+```
+## [1] "integer"
+```
+]
+
+---
+
+# Non-numeric Data in R
+
+&lt;img src="img/nominal_ordinal_binary.png" width="80%" /&gt;
+
+---
+
+# Nominal Data 
+
+.left-column[
+&lt;img src="img/nominal.jpg" width="100%" /&gt;
+]
+
+--
+
+### From character (text strings)
+    
+
+```r
+animal &lt;- 
+  c("turtle","snail","butterfly",
+    "turtle","butterfly")
+
+class(animal)
+```
+
+```
+## [1] "character"
+```
+
+--
+
+
+```r
+table(animal) %&gt;% knitr::kable()
+```
+
+
+
+|animal    | Freq|
+|:---------|----:|
+|butterfly |    2|
+|snail     |    1|
+|turtle    |    2|
+
+Notice that these are in alphabetical order
+
+---
+
+# Nominal Data as "Factor"
+
+.pull-left[
+Suppose on a survey each nurse selects the hospital where they work:
+
+1. Emory Hospital (on Clifton Road)
+2. Emory Midtown
+3. Emory Decatur
+4. Saint Joseph's
+
+And we get the 7 responses of: 1, 1, 2, 3, 2, 2, 4
+
+
+```r
+hosp_choice &lt;- c(1,1,2,3,2,2,4)
+hospital &lt;- 
+  factor(hosp_choice,
+         levels = c(1,2,3,4),
+         labels = c("EHospital",
+                    "EMidtown",
+                    "EDecatur",
+                    "St. Joe"))
+```
+]
+
+--
+
+.pull-right[
+Notice that the 
+
+* `levels` corresponds to the response (choice) number and
+* `labels` corresponds to the text of the response option.
+
+
+```r
+table(hospital) %&gt;% knitr::kable()
+```
+
+
+
+|hospital  | Freq|
+|:---------|----:|
+|EHospital |    2|
+|EMidtown  |    3|
+|EDecatur  |    1|
+|St. Joe   |    1|
+
+Notice the responses are **in order by the response number** NOT alphabetical order.]
+
+---
+
+# Ordinal Data as "Factor"
+
+.left-column[
+&lt;img src="img/ordinal.jpg" width="=100%" /&gt;
+]
+
+.right-column[
+### Alphabetical Order is a Problem
+
+Suppose we have "awful", "ok" and "awesome" as options for "how are you feeling today?" question.
+
+
+```r
+feeling &lt;- 
+  c("ok","ok","awesome","awful")
+```
+
+In a table, the default is alphabetical order:
+
+
+```r
+table(feeling) %&gt;% knitr:: kable()
+```
+
+
+
+|feeling | Freq|
+|:-------|----:|
+|awesome |    1|
+|awful   |    1|
+|ok      |    2|
+]
+
+---
+
+# Create Ordered Factor
+
+List the text responses (levels) in the order you want and specify `ordered = TRUE`.
+
+
+```r
+feeling_ordf &lt;- 
+  factor(feeling,
+         levels = c("awesome",
+                    "ok",
+                    "awful"),
+*        ordered = TRUE)
+```
+
+--
+
+Now the table is in a logical order
+
+
+```r
+table(feeling_ordf) %&gt;% knitr:: kable()
+```
+
+
+
+|feeling_ordf | Freq|
+|:------------|----:|
+|awesome      |    1|
+|ok           |    2|
+|awful        |    1|
+
+---
+
+# Binary Data
+
+.left-column[
+&lt;img src="img/binary.jpg" width="=100%" /&gt;
+]
+
+.right-column[
+A variable is "binary" if it only has 2 values.
+
+
+```r
+animals &lt;- c("shark","shark","dino","dino","shark")
+table(animals) %&gt;% knitr::kable()
+```
+
+
+
+|animals | Freq|
+|:-------|----:|
+|dino    |    2|
+|shark   |    3|
+
+Logical variables are also "binary".
+
+
+```r
+extinct &lt;- animals == "dino"
+table(extinct) %&gt;% knitr::kable()
+```
+
+
+
+|extinct | Freq|
+|:-------|----:|
+|FALSE   |    3|
+|TRUE    |    2|
+
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="midd_xaringan.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "gruvbox-light",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

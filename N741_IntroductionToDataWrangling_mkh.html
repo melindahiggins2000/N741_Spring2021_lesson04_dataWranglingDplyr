@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data Wrangling</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Melinda Higgins" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+    <link rel="stylesheet" href="css/middleburymkh.css" type="text/css" />
+    <link rel="stylesheet" href="css/middleburymkh-fonts.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data Wrangling
+## Working with Data in R &amp; Introduction to Dplyr
+### Melinda Higgins
+### Emory University </br> 02/10/2021
+
+---
+
+
+
+background-size: 100%
+background-image: url(img/data_cowboy.png)
+background-position: 70% 70%
+class: center, top
+
+# Become a Data Wrangler!
+
+.footnote[
+* Illustrations by Allison Horst, RStudio Artist in Residence, &lt;https://github.com/allisonhorst/stats-illustrations&gt;
+]
+
+---
+
+# What's in My Dataset?
+
+* `str()` see structure of data
+* `head()` and `tail()` functions
+* `names()` list variable names in dataset
+* numerical data - use `summary()`
+* categorical variable or factors - use `table()`
+
+---
+
+# Palmer Penguins Data - Structure
+
+1. Load palmerpenguins package
+2. See structure of data
+
+
+```r
+library(palmerpenguins)
+str(penguins)
+```
+
+```
+## tibble [344 x 8] (S3: tbl_df/tbl/data.frame)
+##  $ species          : Factor w/ 3 levels "Adelie","Chinstrap",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ island           : Factor w/ 3 levels "Biscoe","Dream",..: 3 3 3 3 3 3 3 3 3 3 ...
+##  $ bill_length_mm   : num [1:344] 39.1 39.5 40.3 NA 36.7 39.3 38.9 39.2 34.1 42 ...
+##  $ bill_depth_mm    : num [1:344] 18.7 17.4 18 NA 19.3 20.6 17.8 19.6 18.1 20.2 ...
+##  $ flipper_length_mm: int [1:344] 181 186 195 NA 193 190 181 195 193 190 ...
+##  $ body_mass_g      : int [1:344] 3750 3800 3250 NA 3450 3650 3625 4675 3475 4250 ...
+##  $ sex              : Factor w/ 2 levels "female","male": 2 1 1 NA 1 2 1 2 NA NA ...
+##  $ year             : int [1:344] 2007 2007 2007 2007 2007 2007 2007 2007 2007 2007 ...
+```
+
+---
+
+# Palmer Penguins Data - "Peek" at Data
+
+1. See top and bottoms rows of data
+2. Use `head()` function
+
+
+```r
+head(penguins)
+```
+
+```
+## # A tibble: 6 x 8
+##   species island bill_length_mm bill_depth_mm flipper_length_~
+##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;
+## 1 Adelie  Torge~           39.1          18.7              181
+## 2 Adelie  Torge~           39.5          17.4              186
+## 3 Adelie  Torge~           40.3          18                195
+## 4 Adelie  Torge~           NA            NA                 NA
+## 5 Adelie  Torge~           36.7          19.3              193
+## 6 Adelie  Torge~           39.3          20.6              190
+## # ... with 3 more variables: body_mass_g &lt;int&gt;, sex &lt;fct&gt;,
+## #   year &lt;int&gt;
+```
+
+Notice we cannot "see" all of the data - some columns hidden? The data is in a `tibble` data "class"
+
+
+```r
+class(penguins)
+```
+
+```
+## [1] "tbl_df"     "tbl"        "data.frame"
+```
+
+---
+
+# Look at more rows - bottom 10 rows
+
+Add the number 10 to the `tail()` function.
+
+
+```r
+tail(penguins, 10)
+```
+
+```
+## # A tibble: 10 x 8
+##    species island bill_length_mm bill_depth_mm flipper_length_~
+##    &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;
+##  1 Chinst~ Dream            50.2          18.8              202
+##  2 Chinst~ Dream            45.6          19.4              194
+##  3 Chinst~ Dream            51.9          19.5              206
+##  4 Chinst~ Dream            46.8          16.5              189
+##  5 Chinst~ Dream            45.7          17                195
+##  6 Chinst~ Dream            55.8          19.8              207
+##  7 Chinst~ Dream            43.5          18.1              202
+##  8 Chinst~ Dream            49.6          18.2              193
+##  9 Chinst~ Dream            50.8          19                210
+## 10 Chinst~ Dream            50.2          18.7              198
+## # ... with 3 more variables: body_mass_g &lt;int&gt;, sex &lt;fct&gt;,
+## #   year &lt;int&gt;
+```
+
+From `help(tail)` page:
+
+```
+## S3 method for class 'function'
+tail(x, n = 6L, ...)
+```
+---
+
+# Convert from a `tibble` to a plain `data.frame`
+
+We can convert this to a plain `data.frame` class and then look at the complete data.
+
+
+```r
+penguins.df &lt;- data.frame(penguins)
+class(penguins.df)
+```
+
+```
+## [1] "data.frame"
+```
+
+```r
+head(penguins.df)
+```
+
+```
+##   species    island bill_length_mm bill_depth_mm
+## 1  Adelie Torgersen           39.1          18.7
+## 2  Adelie Torgersen           39.5          17.4
+## 3  Adelie Torgersen           40.3          18.0
+## 4  Adelie Torgersen             NA            NA
+## 5  Adelie Torgersen           36.7          19.3
+## 6  Adelie Torgersen           39.3          20.6
+##   flipper_length_mm body_mass_g    sex year
+## 1               181        3750   male 2007
+## 2               186        3800 female 2007
+## 3               195        3250 female 2007
+## 4                NA          NA   &lt;NA&gt; 2007
+## 5               193        3450 female 2007
+## 6               190        3650   male 2007
+```
+
+---
+
+# Using `dplyr` - functions are verbs
+
+Let's `pull()` out one variable (column) `bill_length_mm` from the `penguins` dataset and then get the `mean()`.
+
+We will use the pipe operator `%&gt;%` from `dplyr` to chain our programming steps together in a logical order.
+
+
+```r
+penguins %&gt;%
+  pull(bill_length_mm) %&gt;%
+  mean()
+```
+
+```
+## [1] NA
+```
+
+Try again - add `na.rm=TRUE` option to the `mean()` function find the mean of all of the non-missing (not `NA`) values.
+
+
+```r
+penguins %&gt;%
+  pull(bill_length_mm) %&gt;%
+  mean(na.rm = TRUE)
+```
+
+```
+## [1] 43.92193
+```
+
+.footnote[
+Learn more at [https://dplyr.tidyverse.org/](https://dplyr.tidyverse.org/).
+]
+
+---
+
+# The Base R way to do the same thing
+
+
+```r
+mean(penguins$bill_length_mm, na.rm = TRUE)
+```
+
+```
+## [1] 43.92193
+```
+
+--
+
+This is processed similar to the previous slide, but now we have to look from the inside out. 
+
+--
+
+The `$` operator selects the `bill_length_mm` variable in the `penguins` dataset.
+
+--
+
+This is fed into the `mean()` function as the column vector of data we want to find the mean for.
+
+--
+
+And then we also add the `na.rm = TRUE` option to the `mean()` function.
+
+--
+
+.footnote[I like `dplyr` better. But knowing the base R way is good also.]
+
+---
+
+# Choose more than 1 variable with `select()`
+
+Let's get `summary()` statistics for `body_mass_g` and `flipper_length_mm`
+
+
+```r
+penguins %&gt;%
+  select(body_mass_g, flipper_length_mm) %&gt;%
+  summary()
+```
+
+```
+##   body_mass_g   flipper_length_mm
+##  Min.   :2700   Min.   :172.0    
+##  1st Qu.:3550   1st Qu.:190.0    
+##  Median :4050   Median :197.0    
+##  Mean   :4202   Mean   :200.9    
+##  3rd Qu.:4750   3rd Qu.:213.0    
+##  Max.   :6300   Max.   :231.0    
+##  NA's   :2      NA's   :2
+```
+
+The `summary()` function is a useful base R function - I just wish it gave you standard deviation!!!
+
+---
+
+# Create custom statistics output
+
+The `summarise()` function from `dplyr` will let you create custom statistical summaries.
+
+
+```r
+penguins %&gt;%
+  select(body_mass_g, flipper_length_mm) %&gt;%
+  summarise(
+    body_mean = mean(body_mass_g, na.rm=TRUE),
+    body_sd = sd(body_mass_g, na.rm=TRUE),
+    flip_mean = mean(flipper_length_mm, na.rm=TRUE),
+    flip_sd = sd(flipper_length_mm, na.rm=TRUE)
+  )
+```
+
+```
+## # A tibble: 1 x 4
+##   body_mean body_sd flip_mean flip_sd
+##       &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1     4202.    802.      201.    14.1
+```
+
+---
+
+# Use `group_by()` to further improve your output
+
+Let's get the same output but now grouped by `species.` Notice we added `species` to the `select()` list of variables.
+
+
+```r
+penguins %&gt;%
+  select(body_mass_g, flipper_length_mm, species) %&gt;%
+* group_by(species) %&gt;%
+  summarise(
+    body_mean = mean(body_mass_g, na.rm=TRUE),
+    body_sd = sd(body_mass_g, na.rm=TRUE),
+    flip_mean = mean(flipper_length_mm, na.rm=TRUE),
+    flip_sd = sd(flipper_length_mm, na.rm=TRUE)
+  )
+```
+
+```
+## # A tibble: 3 x 5
+##   species   body_mean body_sd flip_mean flip_sd
+## * &lt;fct&gt;         &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 Adelie        3701.    459.      190.    6.54
+## 2 Chinstrap     3733.    384.      196.    7.13
+## 3 Gentoo        5076.    504.      217.    6.48
+```
+
+---
+
+# Use `knitr::kable()` for pretty output table
+
+Use `knitr::kable()` on any table, data.frame, matrix or tibble to get pretty output.
+
+
+```r
+penguins %&gt;%
+  select(body_mass_g, flipper_length_mm, species) %&gt;%
+  group_by(species) %&gt;%
+  summarise(
+    body_mean = mean(body_mass_g, na.rm=TRUE),
+    body_sd = sd(body_mass_g, na.rm=TRUE),
+    flip_mean = mean(flipper_length_mm, na.rm=TRUE),
+    flip_sd = sd(flipper_length_mm, na.rm=TRUE)
+  ) %&gt;%
+* knitr::kable()
+```
+
+
+
+|species   | body_mean|  body_sd| flip_mean|  flip_sd|
+|:---------|---------:|--------:|---------:|--------:|
+|Adelie    |  3700.662| 458.5661|  189.9536| 6.539457|
+|Chinstrap |  3733.088| 384.3351|  195.8235| 7.131894|
+|Gentoo    |  5076.016| 504.1162|  217.1870| 6.484976|
+
+---
+
+# `knitr::kable()` - add better column headings
+
+Use `knitr::kable()` on any table, data.frame, matrix or tibble to get pretty output.
+
+
+```r
+penguins %&gt;%
+  select(body_mass_g, flipper_length_mm, species) %&gt;%
+  group_by(species) %&gt;%
+  summarise(
+    body_mean = mean(body_mass_g, na.rm=TRUE),
+    body_sd = sd(body_mass_g, na.rm=TRUE),
+    flip_mean = mean(flipper_length_mm, na.rm=TRUE),
+    flip_sd = sd(flipper_length_mm, na.rm=TRUE)
+  ) %&gt;%
+* knitr::kable(col.names = c("Species",
+*                            "Mean Body Mass (g)",
+*                            "SD of Body Mass (g)",
+*                            "Mean Flipper Length (mm)",
+*                            "SD of Flipper Length (mm)"))
+```
+
+
+
+|Species   | Mean Body Mass (g)| SD of Body Mass (g)| Mean Flipper Length (mm)| SD of Flipper Length (mm)|
+|:---------|------------------:|-------------------:|------------------------:|-------------------------:|
+|Adelie    |           3700.662|            458.5661|                 189.9536|                  6.539457|
+|Chinstrap |           3733.088|            384.3351|                 195.8235|                  7.131894|
+|Gentoo    |           5076.016|            504.1162|                 217.1870|                  6.484976|
+
+---
+
+&lt;img src="img/dplyr_filter.jpg" width="=100%" /&gt;
+
+---
+
+# Using `dplyr::filter()` to select cases (rows)
+
+Get summary statistics for the Chinstrap penguins
+
+
+```r
+penguins %&gt;%
+* filter(species == "Chinstrap") %&gt;%
+  summary()
+```
+
+```
+##       species         island   bill_length_mm  bill_depth_mm  
+##  Adelie   : 0   Biscoe   : 0   Min.   :40.90   Min.   :16.40  
+##  Chinstrap:68   Dream    :68   1st Qu.:46.35   1st Qu.:17.50  
+##  Gentoo   : 0   Torgersen: 0   Median :49.55   Median :18.45  
+##                                Mean   :48.83   Mean   :18.42  
+##                                3rd Qu.:51.08   3rd Qu.:19.40  
+##                                Max.   :58.00   Max.   :20.80  
+##  flipper_length_mm  body_mass_g       sex          year     
+##  Min.   :178.0     Min.   :2700   female:34   Min.   :2007  
+##  1st Qu.:191.0     1st Qu.:3488   male  :34   1st Qu.:2007  
+##  Median :196.0     Median :3700               Median :2008  
+##  Mean   :195.8     Mean   :3733               Mean   :2008  
+##  3rd Qu.:201.0     3rd Qu.:3950               3rd Qu.:2009  
+##  Max.   :212.0     Max.   :4800               Max.   :2009
+```
+
+---
+
+&lt;img src="img/dplyr_mutate.png" width="75%" /&gt;
+
+---
+
+# `dplyr::mutate()` to make new variables
+
+The body_mass_g is currently in grams. Let's create a new variable for the mass in kg. Save the updated dataset as `penguins.mod`.
+
+
+```r
+penguins.mod &lt;- penguins %&gt;%
+  mutate(body_mass_kg = body_mass_g / 1000)
+
+penguins.mod %&gt;%
+  select(body_mass_g, body_mass_kg) %&gt;%
+  head()
+```
+
+```
+## # A tibble: 6 x 2
+##   body_mass_g body_mass_kg
+##         &lt;int&gt;        &lt;dbl&gt;
+## 1        3750         3.75
+## 2        3800         3.8 
+## 3        3250         3.25
+## 4          NA        NA   
+## 5        3450         3.45
+## 6        3650         3.65
+```
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="midd_xaringan.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "gruvbox-light",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

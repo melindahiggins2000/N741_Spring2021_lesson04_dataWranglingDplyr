@@ -1,0 +1,206 @@
+---
+title: "R Objects - Factors"
+subtitle: "How to work with numbers and text together"
+author: "Melinda Higgins"
+date: "Emory University </br> 02/11/2021"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["default", "css/middleburymkh.css", "css/middleburymkh-fonts.css", "css/sidecodeplot.css"]
+    nature:
+      beforeInit: ["midd_xaringan.js"]
+      highlightStyle: gruvbox-light
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "middlebury_header.html"
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+# For htmltools package, you may set options(htmltools.dir.version = FALSE) to suppress the version number in the subdirectory name.
+options(htmltools.dir.version = FALSE)
+library(knitr)
+library(dplyr)
+```
+
+# Numeric Data in R
+
+.pull-left[
+
+```{r out.width = '100%', echo=FALSE}
+knitr::include_graphics("img/continuous_discrete.png")
+```
+]
+
+.pull-right[
+### CONTINUOUS - numeric (double)
+    
+```{r}
+x <- c(1.12, 1.13, 4.23)
+class(x)
+```
+
+### DISCRETE - integer
+
+```{r}
+y <- as.integer(c(1,2,3,4))
+class(y)
+```
+]
+
+---
+
+# Non-numeric Data in R
+
+```{r out.width = '80%', echo=FALSE}
+knitr::include_graphics("img/nominal_ordinal_binary.png")
+```
+
+---
+
+# Nominal Data 
+
+.left-column[
+```{r out.width = '100%', echo=FALSE}
+knitr::include_graphics("img/nominal.jpg")
+```
+]
+
+--
+
+### From character (text strings)
+    
+```{r}
+animal <- 
+  c("turtle","snail","butterfly",
+    "turtle","butterfly")
+
+class(animal)
+```
+
+--
+
+```{r}
+table(animal) %>% knitr::kable()
+```
+
+Notice that these are in alphabetical order
+
+---
+
+# Nominal Data as "Factor"
+
+.pull-left[
+Suppose on a survey each nurse selects the hospital where they work:
+
+1. Emory Hospital (on Clifton Road)
+2. Emory Midtown
+3. Emory Decatur
+4. Saint Joseph's
+
+And we get the 7 responses of: 1, 1, 2, 3, 2, 2, 4
+
+```{r}
+hosp_choice <- c(1,1,2,3,2,2,4)
+hospital <- 
+  factor(hosp_choice,
+         levels = c(1,2,3,4),
+         labels = c("EHospital",
+                    "EMidtown",
+                    "EDecatur",
+                    "St. Joe"))
+```
+]
+
+--
+
+.pull-right[
+Notice that the 
+
+* `levels` corresponds to the response (choice) number and
+* `labels` corresponds to the text of the response option.
+
+```{r}
+table(hospital) %>% knitr::kable()
+```
+
+Notice the responses are **in order by the response number** NOT alphabetical order.]
+
+---
+
+# Ordinal Data as "Factor"
+
+.left-column[
+```{r out.width = '=100%', echo=FALSE}
+knitr::include_graphics("img/ordinal.jpg")
+```
+]
+
+.right-column[
+### Alphabetical Order is a Problem
+
+Suppose we have "awful", "ok" and "awesome" as options for "how are you feeling today?" question.
+
+```{r}
+feeling <- 
+  c("ok","ok","awesome","awful")
+```
+
+In a table, the default is alphabetical order:
+
+```{r}
+table(feeling) %>% knitr:: kable()
+```
+]
+
+---
+
+# Create Ordered Factor
+
+List the text responses (levels) in the order you want and specify `ordered = TRUE`.
+
+```{r}
+feeling_ordf <- 
+  factor(feeling,
+         levels = c("awesome",
+                    "ok",
+                    "awful"),
+         ordered = TRUE) #<<
+```
+
+--
+
+Now the table is in a logical order
+
+```{r}
+table(feeling_ordf) %>% knitr:: kable()
+```
+
+---
+
+# Binary Data
+
+.left-column[
+```{r out.width = '=100%', echo=FALSE}
+knitr::include_graphics("img/binary.jpg")
+```
+]
+
+.right-column[
+A variable is "binary" if it only has 2 values.
+
+```{r}
+animals <- c("shark","shark","dino","dino","shark")
+table(animals) %>% knitr::kable()
+```
+
+Logical variables are also "binary".
+
+```{r}
+extinct <- animals == "dino"
+table(extinct) %>% knitr::kable()
+```
+
+]

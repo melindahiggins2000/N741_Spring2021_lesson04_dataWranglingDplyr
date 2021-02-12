@@ -1,0 +1,416 @@
+---
+title: "Xaringan example"
+subtitle: "Middlebury College template"
+author: "Joseph V. Casillas"
+date: "Middlebury College </br> `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["default", "css/middleburymkh.css", "css/middleburymkh-fonts.css"]
+    nature:
+      beforeInit: ["midd_xaringan.js"]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "middlebury_header.html"
+---
+```{r setup, include=FALSE}
+# For htmltools package, you may set options(htmltools.dir.version = FALSE) to suppress the version number in the subdirectory name.
+options(htmltools.dir.version = FALSE)
+```
+
+background-size: 100%
+background-image: url(https://media.giphy.com/media/94iS62lx8CRQA/giphy.gif)
+background-position: 70% 70%
+class: center, bottom, inverse
+
+???
+
+Image test. Taken from google. 
+
+class: blank-slide
+---
+
+# IPA symbols work in unicode
+
+## /ʃæ.'riŋ.ɡæn/
+
+### /θðszʃʒʂʐçʝʎʟɘɵəɜ/  
+
+#### e̪a̺u̯
+
+|     Word    | Phonological transcription | Phonetic transcription |
+| :---------- | -------------------------- | ---------------------- |
+| casa        | /ˈka.sa/                   | [ˈka.sa]               |
+| taco (Sp.)  | /ˈta.ko/                   | [ˈta.ko]               |
+| taco (Eng.) | /ˈta.ko/                   | [ˈt<sup>h</sup>a.ko]   |
+
+
+---
+
+# Standard slide with R code
+
+```{r, fig.height=4.5, fig.width=12, fig.retina=2, fig.align='center', message=FALSE, warning=FALSE}
+library(tidyverse)
+ggplot(cars, aes(x = dist, y = speed)) + 
+  geom_point() + 
+{{ geom_smooth(method = 'lm', formula = y ~ poly(x, 2))}} # we can highlight lines of code 
+```
+
+---
+
+# Slide basics
+
+- Unordered lists
+  - can be created using "-"
+  - and they can be nested using 2 or 4 spaces
+- We can also make `blockquotes`
+  - we can use `<ru-blockquote>text</ru-blockquote>` 
+  - or `>`
+
+<midd-blockquote>This is a blocked quote</midd-blockquote>
+
+- Footnotes<sup>1</sup>
+
+.footnote[
+[1] Information here.
+]
+
+---
+
+# More basics
+
+### Ordered list
+
+1. one
+2. two 
+3. three
+
+--
+
+- Spaced
+
+--
+
+- List
+
+--
+
+- with increments
+
+--
+
+An incremental 
+--
+sentence with 
+--
+separation.
+
+---
+background-image: url(`r xaringan:::karl`)
+background-position: 50% 50%
+class: center, bottom, inverse
+
+# You only live once!
+
+---
+background-image: url(css/EWoodruffNursing_shield_vt_280.png)
+background-position: 90% 50%
+background-size: 200pt
+
+# Another example
+
+### Lists to the left
+
+- We can place images
+- anywhere on the screen
+- by using **background-image**
+- in conjunction with 
+- **background-position**
+
+### Image to the right
+
+- This can replicate my 'float right' hack
+- We can control the 
+- size of the image
+- by using the 
+- **background-size** option
+
+---
+class: center, middle
+
+# Text adjustments
+
+--
+
+It is also possible to change the .blue[color] of any  
+text by using... 
+
+--
+
+    .color[text here]
+
+--
+
+For example
+
+--
+
+    .grey[grey]
+
+--
+
+will make text .grey[grey]
+
+--
+
+We can do this with white, .grey[grey], .black[black], .RUred[red] and .blue[blue]. 
+
+--
+
+To really make text stand out we can just use \*\*text\*\* like **this**.
+
+---
+
+# Two columns!
+
+.pull-left[
+
+### Some things on the left
+
+1. List of things
+
+1. Plain Markdown;
+
+1. blah blah
+
+1. Plain Markdown;
+
+]
+
+--
+
+.pull-right[
+
+### and other things on the right
+
+1. We do this by using the 
+
+1. \.pull-left[] and \.pull-right[]
+
+1. commands. Just put any text inside the 
+
+1. brackets and you're good to go
+
+]
+
+---
+
+# R code and highlighting (I never use this)
+
+.pull-left[
+An example using a leading `*`:
+
+    ```r
+    if (TRUE) {
+    ** message("Very important!")
+    }
+    ```
+Output:
+```r
+if (TRUE) {
+* message("Very important!")
+}
+```
+
+This is invalid R code, so it is a plain fenced code block that is not executed.
+]
+
+.pull-right[
+An example using `{{}}`:
+
+    `r ''````{r tidy=FALSE}
+    if (TRUE) {
+    *{{ message("Very important!") }}
+    }
+    ```
+Output:
+```{r tidy=FALSE}
+if (TRUE) {
+{{ message("Very important!") }}
+}
+```
+
+It is valid R code so you can run it.
+]
+
+---
+class: middle, bottom
+background-image: url(https://www.jvcasillas.com/midd_xaringan/img/logo/middlebury_shield.png)
+background-position: 90% 50%
+background-size: contain
+
+### <grey>You can</grey>  
+### <grey>fill the</grey>  
+### <grey>screen with </grey>  
+### **background-size: contain**
+
+---
+
+# Macros
+
+- We can insert javascript macros into our presentations
+- For example, if we put the following code into `macros.js`...
+
+```js
+remark.macros.scale = function (percentage) {
+  var url = this;
+  return '<img src="' + url + '" style="width: ' + percentage + '" />';
+};
+```
+
+- ...we can use the markdown call to resize images...
+
+```md
+![:scale 25%](css/EU_shield_vt_280.png)
+```
+
+- These calls can also be put inside html divs so as to control where they appear. 
+
+<div align="center">
+![:scale 10%](css/EU_shield_vt_280.png)
+</div>
+
+- All we need to do is include `beforeInit: "macros.js"` under nature in our YAML front matter
+
+---
+
+# Middlebury stuff
+
+### General
+
+- The theme was designed to work with a 16:9 aspect ratio
+- Set the aspect ratio under the **nature** output parameter...  
+    nature:  
+      &nbsp; &nbsp; ratio: "16:9"
+
+
+### Sections
+
+- We can create section dividers with RU red and grey by using the `class` call:
+
+```md
+class: title-slide-section-blue
+```
+
+or 
+
+```md
+class: title-slide-section-grey
+```
+
+---
+class: title-slide-section-blue
+
+# RU red section divider
+
+### This is the H3 font color
+
+- Our text goes here
+
+- We can use .RUred[other colors]
+
+- like .lightgrey[light grey]
+
+- and also .black[black]
+
+---
+class: title-slide-section-grey
+
+# RU grey section divider
+
+### This is the H3 font color
+
+- Our text goes here
+
+- We can use **bold**
+
+- and .blue[blue]
+
+- and also .black[black]
+
+---
+
+# Tables
+
+### Centering
+
+- Tables are centered by default in **xaringan**. 
+- We can override this using...
+
+    .pull-left[], .pull-right[], etc. 
+
+
+.pull-right[
+
+|  This |  is |   a    |    Table     |
+| :---- | :-- | :----- | :----------: |
+| It is | now | pulled | to the right |
+| 12    | 34  | 56     |      78      |
+
+]
+
+---
+background-image: url(https://upload.wikimedia.org/wikipedia/commons/b/be/Sharingan_triple.svg)
+background-size: 100px
+background-position: 90% 8%
+
+# xaringan
+
+- Press `h` or `?` to see the possible ninjutsu you can use in remark.js.
+
+- You can see all the goodies like this.
+
+- Check out more in-depth tutorial [here](https://slides.yihui.name/xaringan/#1)
+
+---
+class: title-slide-final, middle, mline
+background-image: url(css/EWoodruffNursing_shield_hz_280.png)
+background-size: 300px
+background-position: 50% 5%
+
+# Thanks!
+
+## This is the final slide
+
+### .white[you can add your email, twitter, github, etc. info here]
+
+**Here is an example:**
+
+|                                                                                                            |                                   |
+| :--------------------------------------------------------------------------------------------------------- | :-------------------------------- |
+| <a href="mailto:jcasilla@middlebury.edu">.RUred[<i class="fa fa-paper-plane fa-fw"></i>] | jcasilla@middlebury.edu       |
+| <a href="https://www.jvcasillas.com/midd_xaringan/slides/index.html">.RUred[<i class="fa fa-link fa-fw"></i>] | jvcasillas.com/midd_xaringan/slides |
+| <a href="http://twitter.com/jvcasill">.RUred[<i class="fa fa-twitter fa-fw"></i>] | @jvcasill                         |
+| <a href="http://github.com/jvcasillas">.RUred[<i class="fa fa-github fa-fw"></i>] | @jvcasillas                       |
+
+---
+# test table
+
+```{r}
+knitr::kable(summary(mtcars[,1:4]))
+```
+
+add space here
+
+|      |       |       |
+|-----:|:-----:|:-----:|
+| aaa  | 123   | 125   |
+| bbb  | 342   | 4531  |
+| aaa  | 123   | 125   |
+| bbb  | 342   | 4531  |
+
+add link [github](https://github.com) or <a href="http://github.com/jvcasillas">.RUred[<i class="fa fa-github fa-fw"></i>] | @jvcasillas
+

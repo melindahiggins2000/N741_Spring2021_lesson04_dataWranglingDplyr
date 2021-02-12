@@ -1,0 +1,499 @@
+---
+title: "R Objects"
+subtitle: "Everything in R is an object"
+author: "Melinda Higgins"
+date: "Emory University </br> 02/11/2021"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["default", "css/middleburymkh.css", "css/middleburymkh-fonts.css", "css/sidecodeplot.css"]
+    nature:
+      beforeInit: ["midd_xaringan.js"]
+      highlightStyle: gruvbox-light
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+    includes:
+      in_header: "middlebury_header.html"
+editor_options: 
+  chunk_output_type: console
+---
+```{r setup, include=FALSE}
+# For htmltools package, you may set options(htmltools.dir.version = FALSE) to suppress the version number in the subdirectory name.
+options(htmltools.dir.version = FALSE)
+library(knitr)
+library(dplyr)
+```
+
+# Everything in R is captured as an "object"
+
+When you type a simple equation `2+2` in the **Console** it is "saved" in temporary memory as an "object".
+
+```{r}
+2 + 2
+```
+
+--
+
+To "recall" this value saved in temporary memore, we can call `.Last.value` which is the object where the value `4` is saved.
+
+```{r eval=FALSE}
+.Last.value
+```
+
+```
+[1] 4
+```
+
+---
+
+# **ASSIGN** your results to an "object", use .big[**<-**] 
+
+.pull-left[
+
+Using `.Last.value` is inefficient, so we need to save/store this value in an object. An object is a text string we use to retrieve the value (or elements) we saved. Let's save the results of `2+2` in an object `result`.
+
+For this we will use the **ASSIGN** operator .big[**`<-`**].
+
+```{r}
+result <- 2+2
+```
+]
+
+--
+
+.pull-right[
+
+This is saved now in your "Global Environment". To retrieve this value, simply type the text string `result` to see the value `4`.
+
+```{r}
+result
+```
+
+]
+
+--
+
+.pull-right[
+![globalenv](img/results4_globalenvironment.jpg)
+]
+
+---
+
+# Object Types
+
+Use `class()` function to find out what the object type is.
+
+.pull-left[
+Numeric
+
+```{r}
+x <- 3.1415
+class(x)
+```
+
+Character
+
+```{r}
+favsnack <- "hummus"
+class(favsnack)
+```
+
+Logical - directly assigned (no quotes, ALL CAPS)
+
+```{r}
+likebeets <- TRUE
+class(likebeets)
+```
+]
+
+--
+
+.pull-right[
+
+Get responses: 1=No, 2=Yes
+
+```{r}
+beetchoice <- c(1,1,2,2,1)
+class(beetchoice)
+```
+
+Logical - as result of a "test". Notice the use of the logical operator `==`.
+
+```{r}
+likebeets <- beetchoice == 2
+likebeets
+class(likebeets)
+```
+
+]
+
+---
+
+![objectTypes](img/damariszurell.github.io_DataStructures.jpg)
+
+---
+
+# Object Type Scalar - single values
+
+Scalar - one value (numeric or text)
+
+```{r}
+x <- 3.1415
+class(x)
+```
+
+--
+
+```{r}
+y <- "brocalli"
+class(y)
+```
+
+--
+
+```{r}
+z <- FALSE
+class(z)
+```
+
+--
+
+To see what is in an object, just type the name.
+
+```{r}
+y
+```
+
+
+---
+
+# Object type Vector
+
+.pull-left[
+A vector is multiple values combined `c()` of same type
+
+```{r}
+w <- c(3.1415, 6.626E-34, 343)
+class(w)
+v <- c("brocalli","spinach","carrots")
+class(v)
+```
+
+Confirm these are vectors with `is.vector()`
+
+```{r}
+is.vector(w)
+```
+]
+
+--
+
+.pull-right[
+
+Vectors are only 1-dimensional - only 1 row or 1 column. We can get how long they are (number of elements) using `length()`.
+
+```{r}
+length(v)
+```
+
+**Pick an element:** To see a specific element of a vector use square brackets `[]`'s to specify the index of that element. For example, let's view the 2nd element of `v`.
+
+```{r}
+v[2]
+```
+
+]
+
+---
+
+# Mixing data types
+
+.pull-left[
+```{r}
+class(x)
+class(y)
+class(z)
+```
+
+What happens if we combine different data types?
+]
+
+--
+
+.pull-right[
+Combine `x` (numeric) and `y` (character)
+
+```{r}
+xy <- c(x,y)
+xy
+```
+
+Why does 3.1415 have `"`'s around it?
+
+```{r}
+class(xy)
+```
+
+By mixing numeric and character values R chooses a data type that will best retain ALL of the values. "3.1415" is now the string of characters that represent that number.
+]
+
+---
+
+# Thinking exercise
+
+Combine `x` (numeric) and `z` (logical) - what do you get?
+
+--
+
+```{r}
+xz <- c(x,z)
+xz
+```
+
+Why is the second value 0?
+
+--
+
+```{r}
+class(xz)
+```
+
+It turns out that the logical values of `TRUE` and `FALSE` can be represented as the numbers 1 (for `TRUE`) and 0 (for `FALSE`). Thus `FALSE` was converted to 0 so we have combined numeric values.
+
+---
+
+# Thinking Exercise
+
+Combine `y` (character) and `z` (logical) - what do you get?
+
+--
+
+```{r}
+yz <- c(y,z)
+yz
+```
+
+Notice that `"FALSE"` has `"`'s around it.
+
+--
+
+```{r}
+class(yz)
+```
+
+Even though `FALSE` can convert to a numeric value of 0, when combined with character values, it is also converted to a string of characters that represent the word `"FALSE"`
+
+---
+
+# Matrix - 2-dimensional combination of same type
+
+.pull-left[
+
+Use `matrix()` function
+
+```{r}
+X <- c(1, 2, 3, 4, 5)
+Y <- c(23, 34, 32, 21, 28)
+Z <- c(4.4, 3.0, 3.4, 2.2, 3.8)
+mtx <- matrix(c(X,Y,Z), nrow=5, ncol=3)
+mtx
+class(mtx)
+```
+
+]
+
+--
+
+.pull-right[
+
+Get dimensions using `dim()`
+
+```{r}
+dim(mtx)
+```
+
+**Pick an element:** Notice there are 2 dimensions. So, if we want to see the data at ROW=2 and COLUMN=3, we  use `[]` to select specific [ROW, COLUMN].
+
+```{r}
+mtx[2, 3]
+```
+]
+
+---
+
+# Matrix - select a whole row or a column
+
+.pull-left[
+### Display Matrix `mtx`
+
+```{r}
+mtx
+```
+]
+
+--
+
+.pull-right[
+**Pick a row:** We can pick row 4 by leaving the column index blank.
+
+```{r}
+mtx[4, ] # 4th row of the matrix
+```
+
+**Pick a column:** We can pick row 4 by leaving the column index blank and pick column 3 by leaving the row index blank.
+
+```{r}
+mtx[, 3] # 3rd column of the matrix
+```
+
+]
+---
+
+# Can I add a different data type to a Matrix?
+
+.pull-left[
+```{r}
+A <- c("apple","banana","grapes","apple","orange")
+mtx2 <- matrix(c(X,Y,Z,A), nrow=5, ncol=4)
+mtx2
+```
+
+Why are there `"`'s?
+
+]
+
+--
+
+.pull-right[
+The first matrix `mtx` was numeric.
+
+```{r}
+is.numeric(mtx)
+```
+
+But adding `A` to `mtx2` made everything character!!
+
+```{r}
+is.numeric(mtx2)
+is.character(mtx2)
+```
+]
+
+--
+
+.footnote[So how the heck do I combine different data types?]
+
+---
+
+# Data Frame - same # rows, diffierent column types
+
+.pull-left[
+
+Create using `data.frame()` function
+
+```{r}
+id <- c(1, 2, 3, 4, 5)
+age <- c(23, 34, 32, 21, 28)
+fruit <- c("apple","banana","grapes",
+           "apple","orange")
+beets <- c(TRUE,FALSE,FALSE,TRUE,FALSE)
+df <- data.frame(id, age, fruit, beets)
+df
+```
+]
+
+--
+
+.pull-right[
+See column (variable) names, `names()`
+
+```{r}
+names(df)
+```
+
+Get dimension, `dim()`
+
+```{r}
+dim(df)
+```
+
+See structure, `str()`
+
+```{r}
+str(df)
+```
+
+]
+
+---
+
+# Data Frame - Select elements, rows, columns 
+
+.pull-left[
+### Using [ , ] index selector
+
+Just like matrices, we can select element using the [row, column] index notation.
+
+```{r}
+df[2, 4] # value at 2nd row, 4th column
+df[1, ] # all data on row 1
+df[, 4] # all data in column 4
+```
+]
+
+--
+
+.pull-right[
+### Using $ selector
+
+However, columns in data frames can also be selected by their column names using the .big[`$`] selector.
+
+Column names:
+
+```{r}
+names(df)
+```
+
+Show the `fruit` column (variable) values.
+
+```{r}
+df$fruit
+```
+
+]
+
+--
+
+.footnote[And we will learn a few more ways using `dplyr`]
+---
+
+# Lists are Unstructured and Useful!
+
+.pull-left[
+
+While data frames are tidy rectangular structures with exact rows and columns, often real data is messy. It can be handy to combine multiple types of data structures together. R uses **lists** for this.
+
+List can have different objects types combined.
+
+```{r}
+# combine 
+# x = scalar numeric vale
+# age = numeric vector
+# mtx = numeric matrix
+# df = data frame with mixed variable types
+list1 <- list(x, age, mtx, df)
+```
+]
+
+--
+
+.pull-right[
+```{r}
+list1
+```
+]
+
+--
+
+.footnote[This may not seem useful now, but it will be handy later on... We'll discuss these more later.]
