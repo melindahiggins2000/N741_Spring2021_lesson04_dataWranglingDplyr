@@ -24,7 +24,83 @@ class: center, middle, inverse, title-slide
 
 
 
+background-size: 80%
+background-image: url(img/ggplot2_blank.png)
+background-position: 70% 70%
+class: center, top
 
+.footnote[
+* Illustrations by Allison Horst, RStudio Artist in Residence, &lt;https://github.com/allisonhorst/stats-illustrations&gt;
+]
+
+
+---
+
+class: center, middle, inverse
+
+# Be an Artist! 
+# Create Awesome Figures with `ggplot2`
+
+---
+
+&lt;img src="img/ggfree.jpg" width="60%" /&gt;
+
+.footnote[[https://github.com/ArtPoon/ggfree](https://github.com/ArtPoon/ggfree)]
+---
+
+&lt;img src="img/mancalas.jpg" width="55%" /&gt;
+
+.footnote[[https://www.r-craft.org/r-news/mandalas-colored/](https://www.r-craft.org/r-news/mandalas-colored/)]
+---
+
+.pull-left[
+
+```r
+library(kandinsky)
+kandinsky(iris)
+```
+
+![](N741_IntroductionToGgplot2_mkh_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+]
+
+--
+
+.pull-right[
+
+```r
+kandinsky(airquality)
+```
+
+![](N741_IntroductionToGgplot2_mkh_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+]
+
+.footnote[[http://giorasimchoni.com/2017/07/30/2017-07-30-data-paintings-the-kandinsky-package/](http://giorasimchoni.com/2017/07/30/2017-07-30-data-paintings-the-kandinsky-package/)]
+---
+
+.pull-left[
+
+&lt;img src="img/rgraphgallery_parallel.JPG" width="100%" /&gt;
+]
+
+.pull-right[
+
+&lt;img src="img/rgraphgallery_boxplotjitter.JPG" width="100%" /&gt;
+
+]
+
+.footnote[[https://www.r-graph-gallery.com/ggplot2-package.html](https://www.r-graph-gallery.com/ggplot2-package.html)]
+---
+
+&lt;img src="img/rgraphgallery_violinboxplot.JPG" width="100%" /&gt;
+
+.footnote[[https://www.r-graph-gallery.com/ggplot2-package.html](https://www.r-graph-gallery.com/ggplot2-package.html)]
+---
+
+&lt;img src="img/rgraphgallery_lollipoprose.JPG" width="100%" /&gt;
+
+.footnote[[https://www.r-graph-gallery.com/ggplot2-package.html](https://www.r-graph-gallery.com/ggplot2-package.html)]
+---
 
 .left-code[
 
@@ -41,6 +117,42 @@ ggplot(iris) +
 .right-plot[
 &lt;img src="N741_IntroductionToGgplot2_mkh_files/figure-html/plot-label-out-1.png" width="100%" /&gt;
 ]
+
+---
+class: center, middle, inverse
+
+# Pulling it together - make a canvas
+
+# Patchwork!
+
+&lt;img src="img/patchworklogo.png" width="20%" /&gt;
+
+---
+
+
+```r
+library(ggplot2)
+library(patchwork)
+
+# save each plot as an object
+p1 &lt;- ggplot(mtcars) + geom_point(aes(mpg, disp))
+p2 &lt;- ggplot(mtcars) + geom_boxplot(aes(gear, disp, group = gear))
+p3 &lt;- ggplot(mtcars) + geom_smooth(aes(disp, qsec))
+p4 &lt;- ggplot(mtcars) + geom_bar(aes(carb))
+
+# arrange plots as you like
+(p1 | p2 | p3) / p4
+```
+
+
+```
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+![](N741_IntroductionToGgplot2_mkh_files/figure-html/plot-patch-out-1.png)&lt;!-- --&gt;
+
+---
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

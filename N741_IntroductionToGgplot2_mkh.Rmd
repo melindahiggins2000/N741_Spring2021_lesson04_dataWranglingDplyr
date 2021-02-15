@@ -27,7 +27,89 @@ library(dplyr)
 library(ggplot2)
 ```
 
+background-size: 80%
+background-image: url(img/ggplot2_blank.png)
+background-position: 70% 70%
+class: center, top
 
+.footnote[
+* Illustrations by Allison Horst, RStudio Artist in Residence, <https://github.com/allisonhorst/stats-illustrations>
+]
+
+
+---
+
+class: center, middle, inverse
+
+# Be an Artist! 
+# Create Awesome Figures with `ggplot2`
+
+---
+
+```{r out.width = '60%', echo=FALSE}
+knitr::include_graphics("img/ggfree.jpg")
+```
+
+.footnote[[https://github.com/ArtPoon/ggfree](https://github.com/ArtPoon/ggfree)]
+---
+
+```{r out.width = '55%', echo=FALSE}
+knitr::include_graphics("img/mancalas.jpg")
+```
+
+.footnote[[https://www.r-craft.org/r-news/mandalas-colored/](https://www.r-craft.org/r-news/mandalas-colored/)]
+---
+
+.pull-left[
+```{r message=FALSE, warning=FALSE, error=FALSE}
+library(kandinsky)
+kandinsky(iris)
+```
+]
+
+--
+
+.pull-right[
+```{r}
+kandinsky(airquality)
+```
+
+]
+
+.footnote[[http://giorasimchoni.com/2017/07/30/2017-07-30-data-paintings-the-kandinsky-package/](http://giorasimchoni.com/2017/07/30/2017-07-30-data-paintings-the-kandinsky-package/)]
+---
+
+.pull-left[
+
+```{r out.width = '100%', echo=FALSE}
+knitr::include_graphics("img/rgraphgallery_parallel.JPG")
+```
+]
+
+.pull-right[
+
+```{r out.width = '100%', echo=FALSE}
+knitr::include_graphics("img/rgraphgallery_boxplotjitter.JPG")
+```
+
+]
+
+.footnote[[https://www.r-graph-gallery.com/ggplot2-package.html](https://www.r-graph-gallery.com/ggplot2-package.html)]
+---
+
+```{r out.width = '100%', echo=FALSE}
+knitr::include_graphics("img/rgraphgallery_violinboxplot.JPG")
+```
+
+.footnote[[https://www.r-graph-gallery.com/ggplot2-package.html](https://www.r-graph-gallery.com/ggplot2-package.html)]
+---
+
+```{r out.width = '100%', echo=FALSE}
+knitr::include_graphics("img/rgraphgallery_lollipoprose.JPG")
+```
+
+.footnote[[https://www.r-graph-gallery.com/ggplot2-package.html](https://www.r-graph-gallery.com/ggplot2-package.html)]
+---
 
 .left-code[
 ```{r plot-label, eval=FALSE}
@@ -44,4 +126,37 @@ ggplot(iris) +
 ```{r plot-label-out, ref.label="plot-label", echo=FALSE, fig.dim=c(4.8, 4.5), out.width="100%"}
 ```
 ]
+
+---
+class: center, middle, inverse
+
+# Pulling it together - make a canvas
+
+# Patchwork!
+
+```{r out.width = '20%', echo=FALSE}
+knitr::include_graphics("img/patchworklogo.png")
+```
+
+---
+
+```{r plot-patch, eval=FALSE}
+library(ggplot2)
+library(patchwork)
+
+# save each plot as an object
+p1 <- ggplot(mtcars) + geom_point(aes(mpg, disp))
+p2 <- ggplot(mtcars) + geom_boxplot(aes(gear, disp, group = gear))
+p3 <- ggplot(mtcars) + geom_smooth(aes(disp, qsec))
+p4 <- ggplot(mtcars) + geom_bar(aes(carb))
+
+# arrange plots as you like
+(p1 | p2 | p3) / p4
+```
+
+```{r plot-patch-out, ref.label="plot-patch", echo=FALSE, fig.dim=c(10, 5)}
+```
+
+---
+
 
