@@ -21,6 +21,9 @@ editor_options:
 ```{r setup, include=FALSE}
 # For htmltools package, you may set options(htmltools.dir.version = FALSE) to suppress the version number in the subdirectory name.
 options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
 
 library(knitr)
 library(dplyr)
@@ -46,18 +49,37 @@ class: center, middle, inverse
 
 ---
 
-```{r out.width = '60%', echo=FALSE}
+.left-column[
+# ggfree package
+]
+
+.right-column[
+
+```{r out.width = '80%', echo=FALSE}
 knitr::include_graphics("img/ggfree.jpg")
 ```
 
+]
+
 .footnote[[https://github.com/ArtPoon/ggfree](https://github.com/ArtPoon/ggfree)]
+
+
 ---
 
-```{r out.width = '55%', echo=FALSE}
+.left-column[
+# Make Art - Mandalas!
+]
+
+.right-column[
+
+```{r out.width = '75%', echo=FALSE}
 knitr::include_graphics("img/mancalas.jpg")
 ```
 
+]
+
 .footnote[[https://www.r-craft.org/r-news/mandalas-colored/](https://www.r-craft.org/r-news/mandalas-colored/)]
+
 ---
 
 .pull-left[
@@ -76,8 +98,10 @@ kandinsky(airquality)
 
 ]
 
-.footnote[[http://giorasimchoni.com/2017/07/30/2017-07-30-data-paintings-the-kandinsky-package/](http://giorasimchoni.com/2017/07/30/2017-07-30-data-paintings-the-kandinsky-package/)]
+.footnote[[Link to Kandinsky Package from Github](http://giorasimchoni.com/2017/07/30/2017-07-30-data-paintings-the-kandinsky-package/)]
 ---
+
+# Get inspired at R-Graph-Gallery
 
 .pull-left[
 
@@ -97,12 +121,15 @@ knitr::include_graphics("img/rgraphgallery_boxplotjitter.JPG")
 .footnote[[https://www.r-graph-gallery.com/ggplot2-package.html](https://www.r-graph-gallery.com/ggplot2-package.html)]
 ---
 
-```{r out.width = '100%', echo=FALSE}
+# R-Graph-Gallery
+
+```{r out.width = '80%', echo=FALSE}
 knitr::include_graphics("img/rgraphgallery_violinboxplot.JPG")
 ```
 
 .footnote[[https://www.r-graph-gallery.com/ggplot2-package.html](https://www.r-graph-gallery.com/ggplot2-package.html)]
 ---
+# R-Graph-Gallery - lollipops and roses
 
 ```{r out.width = '100%', echo=FALSE}
 knitr::include_graphics("img/rgraphgallery_lollipoprose.JPG")
@@ -112,13 +139,20 @@ knitr::include_graphics("img/rgraphgallery_lollipoprose.JPG")
 ---
 
 .left-code[
+
+# Make a Scatterplot
+
 ```{r plot-label, eval=FALSE}
-# code chunk here
+# Make a scatterplot
 ggplot(iris) + 
-  aes(Sepal.Length, 
-      Sepal.Width, 
+  aes(x=Sepal.Length, 
+      y=Sepal.Width, 
       color = Species) + 
-  geom_point()  #<<
+  geom_point() +
+  xlab("Sepal Length") +
+  ylab("Sepal Width") +
+  ggtitle("IRIS Dataset")
+  
 ```
 ]
 
@@ -128,6 +162,202 @@ ggplot(iris) +
 ]
 
 ---
+
+.left-code[
+
+# Scatterplot - step-by-step
+
+```{r plot-label1, eval=FALSE}
+# Step 1 specify dataset iris for ggplot()
+ggplot(iris) #<<
+```
+
+The basic plot space is created.
+
+]
+
+.right-plot[
+```{r plot-label1-out, ref.label="plot-label1", echo=FALSE, fig.dim=c(4.8, 4.5), out.width="100%"}
+```
+]
+
+---
+
+.left-code[
+
+# Scatterplot - step-by-step
+
+```{r plot-label2, eval=FALSE}
+# Next add aes (aesthetics)
+ggplot(iris) + 
+  aes(x=Sepal.Length, #<<
+      y=Sepal.Width)  #<<
+```
+
+Add "aesthetics" using aes - provide the variables for X and Y axes. Notice the `aes()` is added using the `+` operator.
+
+]
+
+.right-plot[
+```{r plot-label2-out, ref.label="plot-label2", echo=FALSE, fig.dim=c(4.8, 4.5), out.width="100%"}
+```
+]
+
+---
+
+.left-code[
+
+# Add a geom - geometric object
+
+```{r plot-label3, eval=FALSE}
+# Add points to graph
+ggplot(iris) + 
+  aes(x=Sepal.Length, 
+      y=Sepal.Width) + 
+  geom_point() #<<
+  
+```
+
+Add `geom_point()` to add the points to the graph.
+
+]
+
+.right-plot[
+```{r plot-label3-out, ref.label="plot-label3", echo=FALSE, fig.dim=c(4.8, 4.5), out.width="100%"}
+```
+]
+
+---
+
+.left-code[
+
+# Add color aes
+
+```{r plot-label4, eval=FALSE}
+# Add color aesthetic
+ggplot(iris) + 
+  aes(x=Sepal.Length, 
+      y=Sepal.Width,
+      color = Species) + #<<
+  geom_point() 
+  
+```
+
+Add `color` option to the aesthetics inside the `aes()`.
+
+]
+
+.right-plot[
+```{r plot-label4-out, ref.label="plot-label4", echo=FALSE, fig.dim=c(4.8, 4.5), out.width="100%"}
+```
+]
+
+---
+
+.left-code[
+
+# Add labels to the axes and add a title
+
+```{r plot-label5, eval=FALSE}
+# Add axis labels and a title
+ggplot(iris) + 
+  aes(x=Sepal.Length, 
+      y=Sepal.Width,
+      color = Species) + 
+  geom_point() +
+  xlab("Sepal Length") +   #<<
+  ylab("Sepal Width") +    #<<
+  ggtitle("IRIS Dataset")  #<<
+  
+```
+
+Add axis labels with `xlab()` and `ylab()` and add a title with `ggtitle()`.
+
+]
+
+.right-plot[
+```{r plot-label5-out, ref.label="plot-label5", echo=FALSE, fig.dim=c(4.8, 4.5), out.width="100%"}
+```
+]
+
+---
+
+class: center, middle, inverse
+
+# A Great Resource - R Graphics Cookbook
+
+### [https://r-graphics.org/](https://r-graphics.org/)
+
+and
+
+### [http://www.cookbook-r.com/Graphs/](http://www.cookbook-r.com/Graphs/)
+
+
+---
+
+.left-code[
+
+# Add labels to the axes and add a title
+
+```{r plot-label5a, eval=FALSE}
+# Add axis labels and a title
+ggplot(iris) + 
+  aes(x=Sepal.Length, 
+      y=Sepal.Width,
+      color = Species) + 
+  geom_point() +
+  xlab("Sepal Length") +   #<<
+  ylab("Sepal Width") +    #<<
+  ggtitle("IRIS Dataset")  #<<
+  
+```
+
+Add axis labels with `xlab()` and `ylab()` and add a title with `ggtitle()`.
+
+]
+
+.right-plot[
+```{r plot-label5a-out, ref.label="plot-label5a", echo=FALSE, fig.dim=c(4.8, 4.5), out.width="100%"}
+```
+]
+
+---
+
+.footnote[See code examples at [http://www.cookbook-r.com/Graphs/Plotting_distributions_(ggplot2)/](http://www.cookbook-r.com/Graphs/Plotting_distributions_(ggplot2)/)]
+
+.left-code[
+
+# Make a histogram with overlaid density curve
+
+```{r histplot, eval=FALSE}
+# Use iris dataset
+# Petal.Width variable
+# Histogram with density curve
+# Use y=..density..
+# Overlay with transparent density plot
+ggplot(iris, aes(x=Petal.Width)) + 
+  geom_histogram(aes(y=..density..),      
+                 binwidth=.5,
+                 colour="black", 
+                 fill="white") +
+  geom_density(alpha=.2, 
+               fill="#FF6666") +
+  xlim(-1, 4) #<<
+```
+
+`xlim()` added to expand default limits
+
+]
+
+.right-plot[
+
+```{r histplot-out, ref.label="histplot", echo=FALSE, fig.dim=c(4.8, 4.5), out.width="100%"}
+```
+
+]
+
+---
+
 class: center, middle, inverse
 
 # Pulling it together - make a canvas
