@@ -142,16 +142,20 @@ knitr::include_graphics("img/rgraphgallery_lollipoprose.JPG")
 
 # Make a Scatterplot
 
+Let's look at the Palmer Penguins dataset again. Make a scatterplot of
+
 ```{r plot-label, eval=FALSE}
+library(palmerpenguins)
+
 # Make a scatterplot
-ggplot(iris) + 
-  aes(x=Sepal.Length, 
-      y=Sepal.Width, 
-      color = Species) + 
+ggplot(penguins) + 
+  aes(x=bill_length_mm, 
+      y=bill_depth_mm, 
+      color = species) + 
   geom_point() +
-  xlab("Sepal Length") +
-  ylab("Sepal Width") +
-  ggtitle("IRIS Dataset")
+  xlab("Bill Length (mm)") +
+  ylab("Bill Depth (mm)") +
+  ggtitle("Penguins Bill Dimensions")
   
 ```
 ]
@@ -165,11 +169,11 @@ ggplot(iris) +
 
 .left-code[
 
-# Scatterplot - step-by-step
+# Scatterplot - make plot area
 
 ```{r plot-label1, eval=FALSE}
-# Step 1 specify dataset iris for ggplot()
-ggplot(iris) #<<
+# Step 1 specify dataset penguins for ggplot()
+ggplot(penguins) #<<
 ```
 
 The basic plot space is created.
@@ -185,13 +189,13 @@ The basic plot space is created.
 
 .left-code[
 
-# Scatterplot - step-by-step
+# Scatterplot - add aethetics
 
 ```{r plot-label2, eval=FALSE}
 # Next add aes (aesthetics)
-ggplot(iris) + 
-  aes(x=Sepal.Length, #<<
-      y=Sepal.Width)  #<<
+ggplot(penguins) + 
+  aes(x=bill_length_mm, #<<
+      y=bill_depth_mm)  #<<
 ```
 
 Add "aesthetics" using aes - provide the variables for X and Y axes. Notice the `aes()` is added using the `+` operator.
@@ -207,18 +211,18 @@ Add "aesthetics" using aes - provide the variables for X and Y axes. Notice the 
 
 .left-code[
 
-# Add a geom - geometric object
+# Add a `geom_xxx` - Geometric Object
 
 ```{r plot-label3, eval=FALSE}
 # Add points to graph
-ggplot(iris) + 
-  aes(x=Sepal.Length, 
-      y=Sepal.Width) + 
+ggplot(penguins) + 
+  aes(x=bill_length_mm, 
+      y=bill_depth_mm) + 
   geom_point() #<<
   
 ```
 
-Add `geom_point()` to add the points to the graph.
+Add `geom_point()` to add the **points** to the graph.
 
 ]
 
@@ -231,14 +235,14 @@ Add `geom_point()` to add the points to the graph.
 
 .left-code[
 
-# Add color aes
+# Add Color - use `aes()`
 
 ```{r plot-label4, eval=FALSE}
 # Add color aesthetic
-ggplot(iris) + 
-  aes(x=Sepal.Length, 
-      y=Sepal.Width,
-      color = Species) + #<<
+ggplot(penguins) + 
+  aes(x=bill_length_mm, 
+      y=bill_depth_mm,
+      color = species) + #<<
   geom_point() 
   
 ```
@@ -256,18 +260,18 @@ Add `color` option to the aesthetics inside the `aes()`.
 
 .left-code[
 
-# Add labels to the axes and add a title
+# Add Labels - to the axes and add a title
 
 ```{r plot-label5, eval=FALSE}
 # Add axis labels and a title
-ggplot(iris) + 
-  aes(x=Sepal.Length, 
-      y=Sepal.Width,
-      color = Species) + 
+ggplot(penguins) + 
+  aes(x=bill_length_mm, 
+      y=bill_depth_mm,
+      color = species) + 
   geom_point() +
-  xlab("Sepal Length") +   #<<
-  ylab("Sepal Width") +    #<<
-  ggtitle("IRIS Dataset")  #<<
+  xlab("Bill Length(mm)") +   #<<
+  ylab("Bill Depth (mm)") +    #<<
+  ggtitle("Penguins Bill Dimensions")  #<<
   
 ```
 
@@ -292,35 +296,6 @@ and
 
 ### [http://www.cookbook-r.com/Graphs/](http://www.cookbook-r.com/Graphs/)
 
-
----
-
-.left-code[
-
-# Add labels to the axes and add a title
-
-```{r plot-label5a, eval=FALSE}
-# Add axis labels and a title
-ggplot(iris) + 
-  aes(x=Sepal.Length, 
-      y=Sepal.Width,
-      color = Species) + 
-  geom_point() +
-  xlab("Sepal Length") +   #<<
-  ylab("Sepal Width") +    #<<
-  ggtitle("IRIS Dataset")  #<<
-  
-```
-
-Add axis labels with `xlab()` and `ylab()` and add a title with `ggtitle()`.
-
-]
-
-.right-plot[
-```{r plot-label5a-out, ref.label="plot-label5a", echo=FALSE, fig.dim=c(4.8, 4.5), out.width="100%"}
-```
-]
-
 ---
 
 .footnote[See code examples at [http://www.cookbook-r.com/Graphs/Plotting_distributions_(ggplot2)/](http://www.cookbook-r.com/Graphs/Plotting_distributions_(ggplot2)/)]
@@ -330,28 +305,60 @@ Add axis labels with `xlab()` and `ylab()` and add a title with `ggtitle()`.
 # Make a histogram with overlaid density curve
 
 ```{r histplot, eval=FALSE}
-# Use iris dataset
-# Petal.Width variable
+# Look at flipper_length_mm
+# for Palmer Penguins
 # Histogram with density curve
 # Use y=..density..
 # Overlay with transparent density plot
-ggplot(iris, aes(x=Petal.Width)) + 
+ggplot(penguins, 
+       aes(x=flipper_length_mm)) + 
   geom_histogram(aes(y=..density..),      
-                 binwidth=.5,
+                 binwidth=2,
                  colour="black", 
                  fill="white") +
   geom_density(alpha=.2, 
-               fill="#FF6666") +
-  xlim(-1, 4) #<<
+               fill="#FF6666") 
 ```
-
-`xlim()` added to expand default limits
 
 ]
 
 .right-plot[
 
 ```{r histplot-out, ref.label="histplot", echo=FALSE, fig.dim=c(4.8, 4.5), out.width="100%"}
+```
+
+]
+
+---
+
+# Break out by Facet/Panels
+
+.left-code[
+
+```{r histplot2, eval=FALSE}
+# Look at flipper_length_mm
+# for Palmer Penguins
+# Histogram with density curve
+# Use y=..density..
+# Overlay with transparent density plot
+ggplot(penguins, 
+       aes(x=flipper_length_mm)) + 
+  geom_histogram(aes(y=..density..),      
+                 binwidth=2,
+                 colour="black", 
+                 fill="white") +
+  geom_density(alpha=.2, 
+               fill="#FF6666") +
+  facet_wrap(vars(species)) #<<
+```
+
+Add `facet_wrap()` to make histogram plots for each penguin species in a different facet or panel.
+
+]
+
+.right-plot[
+
+```{r histplot2-out, ref.label="histplot2", echo=FALSE, fig.dim=c(4.8, 3.5), out.width="100%"}
 ```
 
 ]
@@ -370,23 +377,47 @@ knitr::include_graphics("img/patchworklogo.png")
 
 ---
 
+.left-code[
+
 ```{r plot-patch, eval=FALSE}
 library(ggplot2)
 library(patchwork)
 
 # save each plot as an object
-p1 <- ggplot(mtcars) + geom_point(aes(mpg, disp))
-p2 <- ggplot(mtcars) + geom_boxplot(aes(gear, disp, group = gear))
-p3 <- ggplot(mtcars) + geom_smooth(aes(disp, qsec))
-p4 <- ggplot(mtcars) + geom_bar(aes(carb))
+p1 <- ggplot(penguins, 
+         aes(x=bill_length_mm, 
+             y=bill_depth_mm, 
+             color = species)) +
+  geom_point()  
+  
+p2 <- ggplot(penguins, 
+             aes(x=species, 
+                 y=bill_length_mm)) + 
+  geom_boxplot() + 
+  xlab("Species") +   
+  ylab("Bill Depth (mm)")
 
+p3 <- 
+  ggplot(penguins, 
+         aes(x=flipper_length_mm)) + 
+  geom_histogram(aes(y=..density..),      
+    binwidth=2, colour="black", 
+    fill="white") +
+  geom_density(alpha=.2, fill="#FF6666") +
+  facet_wrap(vars(species))
+  
 # arrange plots as you like
-(p1 | p2 | p3) / p4
+(p1 | p2) / p3
 ```
 
-```{r plot-patch-out, ref.label="plot-patch", echo=FALSE, fig.dim=c(10, 5)}
+]
+
+.right-plot[
+
+```{r plot-patch-out, ref.label="plot-patch", echo=FALSE, fig.dim=c(8, 8)}
 ```
 
+]
 ---
 
 
