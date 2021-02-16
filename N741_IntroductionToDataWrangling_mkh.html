@@ -83,16 +83,16 @@ head(penguins)
 
 ```
 ## # A tibble: 6 x 8
-##   species island bill_length_mm bill_depth_mm flipper_length_~
-##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;
-## 1 Adelie  Torge~           39.1          18.7              181
-## 2 Adelie  Torge~           39.5          17.4              186
-## 3 Adelie  Torge~           40.3          18                195
-## 4 Adelie  Torge~           NA            NA                 NA
-## 5 Adelie  Torge~           36.7          19.3              193
-## 6 Adelie  Torge~           39.3          20.6              190
-## # ... with 3 more variables: body_mass_g &lt;int&gt;, sex &lt;fct&gt;,
-## #   year &lt;int&gt;
+##   species island bill_length_mm bill_depth_mm
+##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;
+## 1 Adelie  Torge~           39.1          18.7
+## 2 Adelie  Torge~           39.5          17.4
+## 3 Adelie  Torge~           40.3          18  
+## 4 Adelie  Torge~           NA            NA  
+## 5 Adelie  Torge~           36.7          19.3
+## 6 Adelie  Torge~           39.3          20.6
+## # ... with 4 more variables: flipper_length_mm &lt;int&gt;,
+## #   body_mass_g &lt;int&gt;, sex &lt;fct&gt;, year &lt;int&gt;
 ```
 
 Notice we cannot "see" all of the data - some columns hidden? The data is in a `tibble` data "class"
@@ -119,20 +119,20 @@ tail(penguins, 10)
 
 ```
 ## # A tibble: 10 x 8
-##    species island bill_length_mm bill_depth_mm flipper_length_~
-##    &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;
-##  1 Chinst~ Dream            50.2          18.8              202
-##  2 Chinst~ Dream            45.6          19.4              194
-##  3 Chinst~ Dream            51.9          19.5              206
-##  4 Chinst~ Dream            46.8          16.5              189
-##  5 Chinst~ Dream            45.7          17                195
-##  6 Chinst~ Dream            55.8          19.8              207
-##  7 Chinst~ Dream            43.5          18.1              202
-##  8 Chinst~ Dream            49.6          18.2              193
-##  9 Chinst~ Dream            50.8          19                210
-## 10 Chinst~ Dream            50.2          18.7              198
-## # ... with 3 more variables: body_mass_g &lt;int&gt;, sex &lt;fct&gt;,
-## #   year &lt;int&gt;
+##    species island bill_length_mm bill_depth_mm
+##    &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;
+##  1 Chinst~ Dream            50.2          18.8
+##  2 Chinst~ Dream            45.6          19.4
+##  3 Chinst~ Dream            51.9          19.5
+##  4 Chinst~ Dream            46.8          16.5
+##  5 Chinst~ Dream            45.7          17  
+##  6 Chinst~ Dream            55.8          19.8
+##  7 Chinst~ Dream            43.5          18.1
+##  8 Chinst~ Dream            49.6          18.2
+##  9 Chinst~ Dream            50.8          19  
+## 10 Chinst~ Dream            50.2          18.7
+## # ... with 4 more variables: flipper_length_mm &lt;int&gt;,
+## #   body_mass_g &lt;int&gt;, sex &lt;fct&gt;, year &lt;int&gt;
 ```
 
 From `help(tail)` page:
@@ -146,6 +146,8 @@ tail(x, n = 6L, ...)
 # Convert from a `tibble` to a plain `data.frame`
 
 We can convert this to a plain `data.frame` class and then look at the complete data.
+
+
 
 
 ```r
@@ -162,21 +164,16 @@ head(penguins.df)
 ```
 
 ```
-##   species    island bill_length_mm bill_depth_mm
-## 1  Adelie Torgersen           39.1          18.7
-## 2  Adelie Torgersen           39.5          17.4
-## 3  Adelie Torgersen           40.3          18.0
-## 4  Adelie Torgersen             NA            NA
-## 5  Adelie Torgersen           36.7          19.3
-## 6  Adelie Torgersen           39.3          20.6
-##   flipper_length_mm body_mass_g    sex year
-## 1               181        3750   male 2007
-## 2               186        3800 female 2007
-## 3               195        3250 female 2007
-## 4                NA          NA   &lt;NA&gt; 2007
-## 5               193        3450 female 2007
-## 6               190        3650   male 2007
+##   species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g    sex year
+## 1  Adelie Torgersen           39.1          18.7               181        3750   male 2007
+## 2  Adelie Torgersen           39.5          17.4               186        3800 female 2007
+## 3  Adelie Torgersen           40.3          18.0               195        3250 female 2007
+## 4  Adelie Torgersen             NA            NA                NA          NA   &lt;NA&gt; 2007
+## 5  Adelie Torgersen           36.7          19.3               193        3450 female 2007
+## 6  Adelie Torgersen           39.3          20.6               190        3650   male 2007
 ```
+
+
 
 ---
 
@@ -388,6 +385,41 @@ penguins %&gt;%
 
 ---
 
+&lt;img src="img/dplyr_across.png" width="=100%" /&gt;
+
+---
+
+# `dplyr::across()`
+
+
+```r
+penguins %&gt;%
+  group_by(species) %&gt;%
+* summarize(across(ends_with("mm"), mean, na.rm = TRUE)) %&gt;%
+  knitr::kable()
+```
+
+
+
+|species   | bill_length_mm| bill_depth_mm| flipper_length_mm|
+|:---------|--------------:|-------------:|-----------------:|
+|Adelie    |       38.79139|      18.34636|          189.9536|
+|Chinstrap |       48.83382|      18.42059|          195.8235|
+|Gentoo    |       47.50488|      14.98211|          217.1870|
+
+--
+
+Besides `ends_with()` also explore:
+
+* `starts_with()`
+* `contains()`
+* `matches()`
+* learn more about `tidyselect` package [https://tidyselect.r-lib.org/](https://tidyselect.r-lib.org/) (loaded with `dplyr`)
+
+.footnote[Learn more at [https://allisonhorst.shinyapps.io/dplyr-learnr/#section-welcome](https://allisonhorst.shinyapps.io/dplyr-learnr/#section-welcome)]
+
+---
+
 &lt;img src="img/dplyr_filter.jpg" width="=100%" /&gt;
 
 ---
@@ -397,6 +429,8 @@ penguins %&gt;%
 Get summary statistics for the Chinstrap penguins
 
 
+
+
 ```r
 penguins %&gt;%
 * filter(species == "Chinstrap") %&gt;%
@@ -404,21 +438,23 @@ penguins %&gt;%
 ```
 
 ```
-##       species         island   bill_length_mm  bill_depth_mm  
-##  Adelie   : 0   Biscoe   : 0   Min.   :40.90   Min.   :16.40  
-##  Chinstrap:68   Dream    :68   1st Qu.:46.35   1st Qu.:17.50  
-##  Gentoo   : 0   Torgersen: 0   Median :49.55   Median :18.45  
-##                                Mean   :48.83   Mean   :18.42  
-##                                3rd Qu.:51.08   3rd Qu.:19.40  
-##                                Max.   :58.00   Max.   :20.80  
-##  flipper_length_mm  body_mass_g       sex          year     
-##  Min.   :178.0     Min.   :2700   female:34   Min.   :2007  
-##  1st Qu.:191.0     1st Qu.:3488   male  :34   1st Qu.:2007  
-##  Median :196.0     Median :3700               Median :2008  
-##  Mean   :195.8     Mean   :3733               Mean   :2008  
-##  3rd Qu.:201.0     3rd Qu.:3950               3rd Qu.:2009  
-##  Max.   :212.0     Max.   :4800               Max.   :2009
+##       species         island   bill_length_mm  bill_depth_mm   flipper_length_mm  body_mass_g       sex    
+##  Adelie   : 0   Biscoe   : 0   Min.   :40.90   Min.   :16.40   Min.   :178.0     Min.   :2700   female:34  
+##  Chinstrap:68   Dream    :68   1st Qu.:46.35   1st Qu.:17.50   1st Qu.:191.0     1st Qu.:3488   male  :34  
+##  Gentoo   : 0   Torgersen: 0   Median :49.55   Median :18.45   Median :196.0     Median :3700              
+##                                Mean   :48.83   Mean   :18.42   Mean   :195.8     Mean   :3733              
+##                                3rd Qu.:51.08   3rd Qu.:19.40   3rd Qu.:201.0     3rd Qu.:3950              
+##                                Max.   :58.00   Max.   :20.80   Max.   :212.0     Max.   :4800              
+##       year     
+##  Min.   :2007  
+##  1st Qu.:2007  
+##  Median :2008  
+##  Mean   :2008  
+##  3rd Qu.:2009  
+##  Max.   :2009
 ```
+
+
 
 ---
 
@@ -452,6 +488,56 @@ penguins.mod %&gt;%
 ## 6        3650         3.65
 ```
 
+---
+
+&lt;img src="img/dplyr_case_when.png" width="75%" /&gt;
+
+---
+
+# Making categories or recoding - dplyr::case_when()
+
+.pull-left[
+
+
+```r
+# Use case_when() to create
+# three size categories
+penguins_mod &lt;- penguins %&gt;%
+  mutate(size_bin = case_when(
+    body_mass_g &gt; 4500 ~ "large",
+    body_mass_g &gt; 3000 &amp; 
+      body_mass_g &lt;= 4500 ~ "medium",
+    body_mass_g &lt;= 3000 ~ "small"
+    )
+  )
+
+# Create summary table 
+# of size categories
+penguins_mod %&gt;% 
+  pull(size_bin) %&gt;% 
+* table(useNA = "ifany") %&gt;%
+  knitr::kable(
+    col.names = c("Size Category",
+                  "Frequency"))
+```
+
+]
+
+.pull-right[
+
+### Table of Body Size Categories
+
+
+|Size Category | Frequency|
+|:-------------|---------:|
+|large         |       115|
+|medium        |       216|
+|small         |        11|
+|NA            |         2|
+
+]
+
+.footnote[Notice `useNA = "ifany"` option added to `table()` to print the number of missing `NA`'s]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

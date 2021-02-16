@@ -97,10 +97,19 @@ tail(x, n = 6L, ...)
 
 We can convert this to a plain `data.frame` class and then look at the complete data.
 
+```{r echo=FALSE}
+a <- getOption("width")
+options(width=120)
+```
+
 ```{r}
 penguins.df <- data.frame(penguins)
 class(penguins.df)
 head(penguins.df)
+```
+
+```{r echo=FALSE}
+options(width=a)
 ```
 
 ---
@@ -251,6 +260,34 @@ penguins %>%
 ---
 
 ```{r out.width = '=100%', echo=FALSE}
+knitr::include_graphics("img/dplyr_across.png")
+```
+
+---
+
+# `dplyr::across()`
+
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarize(across(ends_with("mm"), mean, na.rm = TRUE)) %>% #<<
+  knitr::kable()
+```
+
+--
+
+Besides `ends_with()` also explore:
+
+* `starts_with()`
+* `contains()`
+* `matches()`
+* learn more about `tidyselect` package [https://tidyselect.r-lib.org/](https://tidyselect.r-lib.org/) (loaded with `dplyr`)
+
+.footnote[Learn more at [https://allisonhorst.shinyapps.io/dplyr-learnr/#section-welcome](https://allisonhorst.shinyapps.io/dplyr-learnr/#section-welcome)]
+
+---
+
+```{r out.width = '=100%', echo=FALSE}
 knitr::include_graphics("img/dplyr_filter.jpg")
 ```
 
@@ -260,10 +297,19 @@ knitr::include_graphics("img/dplyr_filter.jpg")
 
 Get summary statistics for the Chinstrap penguins
 
+```{r echo=FALSE}
+a <- getOption("width")
+options(width=120)
+```
+
 ```{r}
 penguins %>%
   filter(species == "Chinstrap") %>% #<<
   summary()
+```
+
+```{r echo=FALSE}
+options(width=a)
 ```
 
 ---
@@ -288,3 +334,49 @@ penguins.mod %>%
   
 ```
 
+---
+
+```{r out.width = '75%', echo=FALSE}
+knitr::include_graphics("img/dplyr_case_when.png")
+```
+
+---
+
+# Making categories or recoding - dplyr::case_when()
+
+.pull-left[
+
+```{r tablesize, eval=FALSE}
+# Use case_when() to create
+# three size categories
+penguins_mod <- penguins %>%
+  mutate(size_bin = case_when(
+    body_mass_g > 4500 ~ "large",
+    body_mass_g > 3000 & 
+      body_mass_g <= 4500 ~ "medium",
+    body_mass_g <= 3000 ~ "small"
+    )
+  )
+
+# Create summary table 
+# of size categories
+penguins_mod %>% 
+  pull(size_bin) %>% 
+  table(useNA = "ifany") %>% #<<
+  knitr::kable(
+    col.names = c("Size Category",
+                  "Frequency"))
+```
+
+]
+
+.pull-right[
+
+### Table of Body Size Categories
+
+```{r tablesize-out, ref.label="tablesize", echo=FALSE}
+```
+
+]
+
+.footnote[Notice `useNA = "ifany"` option added to `table()` to print the number of missing `NA`'s]

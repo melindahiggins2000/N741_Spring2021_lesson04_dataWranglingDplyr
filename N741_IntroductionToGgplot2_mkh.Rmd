@@ -377,6 +377,12 @@ knitr::include_graphics("img/patchworklogo.png")
 
 ---
 
+```{r out.width = '80%', echo=FALSE}
+knitr::include_graphics("img/patchwork_blank.png")
+```
+
+---
+
 .left-code[
 
 ```{r plot-patch, eval=FALSE}
