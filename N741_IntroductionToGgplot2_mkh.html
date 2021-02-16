@@ -25,7 +25,7 @@ class: center, middle, inverse, title-slide
 
 
 background-size: 80%
-background-image: url(img/ggplot2_blank.png)
+background-image: url(img/ggplot2_masterpiece.png)
 background-position: 70% 70%
 class: center, top
 
@@ -160,7 +160,8 @@ ggplot(penguins) +
 
 
 ```r
-# Step 1 specify dataset penguins for ggplot()
+# Step 1 specify dataset 
+# penguins for ggplot()
 *ggplot(penguins)
 ```
 
@@ -268,6 +269,93 @@ Add axis labels with `xlab()` and `ylab()` and add a title with `ggtitle()`.
 &lt;img src="N741_IntroductionToGgplot2_mkh_files/figure-html/plot-label5-out-1.png" width="100%" /&gt;
 ]
 
+
+---
+
+.footnote[See more themes at [https://ggplot2.tidyverse.org/reference/ggtheme.html](https://ggplot2.tidyverse.org/reference/ggtheme.html)]
+
+.left-code[
+
+# Jazz it up - add a theme
+
+
+```r
+# Add axis labels and a title
+ggplot(penguins) + 
+  aes(x=bill_length_mm, 
+      y=bill_depth_mm,
+      color = species) + 
+  geom_point() +
+  xlab("Bill Length(mm)") + 
+  ylab("Bill Depth (mm)") + 
+  ggtitle("Penguins Bill Dimensions") +
+* theme_dark()
+```
+
+]
+
+.right-plot[
+&lt;img src="N741_IntroductionToGgplot2_mkh_files/figure-html/plot-label6-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.footnote[Try `ggthemes` on CRAN [https://cran.r-project.org/web/packages/ggthemes/index.html](https://cran.r-project.org/web/packages/ggthemes/index.html)]
+
+.left-code[
+
+### `ggthemes` package
+
+
+```r
+library(ggthemes)
+
+ggplot(penguins) + 
+  aes(x=bill_length_mm, 
+      y=bill_depth_mm,
+      color = species) + 
+  geom_point() +
+  xlab("Bill Length(mm)") + 
+  ylab("Bill Depth (mm)") + 
+  ggtitle("WSJ Theme") +
+  theme_wsj()
+```
+]
+
+.right-plot[
+&lt;img src="N741_IntroductionToGgplot2_mkh_files/figure-html/ggtheme1-out-1.png" width="90%" /&gt;
+]
+
+---
+
+.footnote[See `ggthemr` in development on Github [https://github.com/Mikata-Project/ggthemr](https://github.com/Mikata-Project/ggthemr)]
+
+.left-code[
+
+### `ggthemr` package
+
+
+```r
+library(ggthemr)
+
+ggthemr('pale')
+ggplot(penguins,
+       aes(x=bill_length_mm, 
+           y=bill_depth_mm,
+           colour = species)) + 
+  geom_point() +
+  xlab("Bill Length(mm)") + 
+  ylab("Bill Depth (mm)") + 
+  ggtitle("ggthemr - pale theme") +
+  scale_colour_ggthemr_d()
+ggthemr_reset()
+```
+
+]
+
+.right-plot[
+&lt;img src="N741_IntroductionToGgplot2_mkh_files/figure-html/ggthemr1-out-1.png" width="90%" /&gt;
+]
 ---
 
 class: center, middle, inverse
@@ -309,7 +397,7 @@ ggplot(penguins,
 
 .right-plot[
 
-&lt;img src="N741_IntroductionToGgplot2_mkh_files/figure-html/histplot-out-1.png" width="100%" /&gt;
+&lt;img src="N741_IntroductionToGgplot2_mkh_files/figure-html/histplot-out-1.png" width="90%" /&gt;
 
 ]
 
@@ -404,8 +492,6 @@ p3 &lt;-
 ![](N741_IntroductionToGgplot2_mkh_files/figure-html/plot-patch-out-1.png)&lt;!-- --&gt;
 
 ]
----
-
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
