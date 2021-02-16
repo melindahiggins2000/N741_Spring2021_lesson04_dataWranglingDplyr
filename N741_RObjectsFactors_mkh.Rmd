@@ -204,3 +204,26 @@ table(extinct) %>% knitr::kable()
 ```
 
 ]
+
+---
+
+# Binary Data - Use TRUE=1, FALSE=0
+
+A neat feature of **TRUE/FALSE** logical variables is that because they convert to `0=FALSE, 1=TRUE` you can use: 
+
+* the `sum()` function to get the number (count) of **TRUE** and 
+* use the `mean()` function to get the proportion of **TRUE**.
+
+```{r}
+sum(extinct)
+mean(extinct)
+```
+
+```{r}
+# multiply by 100 to get percent TRUE
+mean(extinct)*100
+```
+
+Write a sentence in Rmarkdown with inline code using `` `r "\u0060r mean(extinct)*100\u0060"` `` to write:
+
+"The percentage of extinct animals was `r mean(extinct)*100` %.

@@ -93,3 +93,13 @@ table(animals) %>% knitr::kable()
 extinct <- animals == "dino"
 table(extinct) %>% knitr::kable()
 
+
+## -------------------------------------------------------
+sum(extinct)
+mean(extinct)
+
+
+## -------------------------------------------------------
+# multiply by 100 to get percent TRUE
+mean(extinct)*100
+

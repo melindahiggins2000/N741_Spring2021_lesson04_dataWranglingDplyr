@@ -264,6 +264,46 @@ table(extinct) %&gt;% knitr::kable()
 |TRUE    |    2|
 
 ]
+
+---
+
+# Binary Data - Use TRUE=1, FALSE=0
+
+A neat feature of **TRUE/FALSE** logical variables is that because they convert to `0=FALSE, 1=TRUE` you can use: 
+
+* the `sum()` function to get the number (count) of **TRUE** and 
+* use the `mean()` function to get the proportion of **TRUE**.
+
+
+```r
+sum(extinct)
+```
+
+```
+## [1] 2
+```
+
+```r
+mean(extinct)
+```
+
+```
+## [1] 0.4
+```
+
+
+```r
+# multiply by 100 to get percent TRUE
+mean(extinct)*100
+```
+
+```
+## [1] 40
+```
+
+Write a sentence in Rmarkdown with inline code using `` `r mean(extinct)*100` `` to write:
+
+"The percentage of extinct animals was 40 %.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
