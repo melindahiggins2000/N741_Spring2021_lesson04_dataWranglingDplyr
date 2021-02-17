@@ -21,6 +21,10 @@ editor_options:
 ```{r setup, include=FALSE}
 # For htmltools package, you may set options(htmltools.dir.version = FALSE) to suppress the version number in the subdirectory name.
 options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
 library(knitr)
 library(dplyr)
 ```
@@ -182,6 +186,52 @@ The `summary()` function is a useful base R function - I just wish it gave you s
 
 ---
 
+# Another "summary" stat function - Hmisc::describe()
+
+```{r echo=FALSE}
+a <- getOption("width")
+options(width=120)
+```
+
+```{r}
+library(Hmisc)
+
+penguins %>%
+  select(body_mass_g, flipper_length_mm) %>%
+  Hmisc::describe()
+```
+
+.footnote[Notice the use of `Hmisc::describe()` - the "describe" function has the same name in both the `Hmisc` and `psych` packages. So we use the syntax `packagename::function()` to avoid confusion.]
+
+```{r echo=FALSE}
+options(width=a)
+```
+
+---
+
+# Also try psych::describe() for summary stats
+
+```{r echo=FALSE}
+a <- getOption("width")
+options(width=120)
+```
+
+```{r}
+library(psych)
+
+penguins %>%
+  select(body_mass_g, flipper_length_mm) %>%
+  psych::describe()
+```
+
+.footnote[Notice the use of `psych::describe()` - the "describe" function has the same name in both the `Hmisc` and `psych` packages. So we use the syntax `packagename::function()` to avoid confusion.]
+
+```{r echo=FALSE}
+options(width=a)
+```
+
+---
+
 # Create custom statistics output
 
 The `summarise()` function from `dplyr` will let you create custom statistical summaries.
@@ -269,8 +319,8 @@ knitr::include_graphics("img/dplyr_across.png")
 
 ```{r}
 penguins %>%
-  group_by(species) %>%
-  summarize(across(ends_with("mm"), mean, na.rm = TRUE)) %>% #<<
+  dplyr::group_by(species) %>%
+  dplyr::summarize(across(ends_with("mm"), mean, na.rm = TRUE)) %>% #<<
   knitr::kable()
 ```
 
@@ -282,6 +332,8 @@ Besides `ends_with()` also explore:
 * `contains()`
 * `matches()`
 * learn more about `tidyselect` package [https://tidyselect.r-lib.org/](https://tidyselect.r-lib.org/) (loaded with `dplyr`)
+
+**NOTE:** The code above added the packagename syntax `dplyr::group_by()` and `dplyr::summarise()` to avoid confusion with `Hmisc::summarize()`.
 
 .footnote[Learn more at [https://allisonhorst.shinyapps.io/dplyr-learnr/#section-welcome](https://allisonhorst.shinyapps.io/dplyr-learnr/#section-welcome)]
 
@@ -380,3 +432,17 @@ penguins_mod %>%
 ]
 
 .footnote[Notice `useNA = "ifany"` option added to `table()` to print the number of missing `NA`'s]
+
+---
+
+# Quick Table Example - Arsenal Package
+
+```{r results = "asis"}
+library(arsenal)
+
+tab1 <- tableby(island ~ bill_length_mm + bill_depth_mm, 
+                data = penguins)
+summary(tab1)
+```
+
+.footnote[Learn more about the arsenal package and tabeby() function at [https://cran.r-project.org/web/packages/arsenal/vignettes/tableby.html](https://cran.r-project.org/web/packages/arsenal/vignettes/tableby.html).]
