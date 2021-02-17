@@ -445,4 +445,4 @@ tab1 <- tableby(island ~ bill_length_mm + bill_depth_mm,
 summary(tab1)
 ```
 
-.footnote[Learn more about the arsenal package and tabeby() function at [https://cran.r-project.org/web/packages/arsenal/vignettes/tableby.html](https://cran.r-project.org/web/packages/arsenal/vignettes/tableby.html).]
+.footnote[Learn more about the `arsenal` package and `tableby()` function at [https://cran.r-project.org/web/packages/arsenal/vignettes/tableby.html](https://cran.r-project.org/web/packages/arsenal/vignettes/tableby.html).]

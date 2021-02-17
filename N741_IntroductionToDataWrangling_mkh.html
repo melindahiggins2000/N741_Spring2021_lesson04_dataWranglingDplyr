@@ -83,16 +83,15 @@ head(penguins)
 
 ```
 ## # A tibble: 6 x 8
-##   species island bill_length_mm bill_depth_mm flipper_length_~
-##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;
-## 1 Adelie  Torge~           39.1          18.7              181
-## 2 Adelie  Torge~           39.5          17.4              186
-## 3 Adelie  Torge~           40.3          18                195
-## 4 Adelie  Torge~           NA            NA                 NA
-## 5 Adelie  Torge~           36.7          19.3              193
-## 6 Adelie  Torge~           39.3          20.6              190
-## # ... with 3 more variables: body_mass_g &lt;int&gt;, sex &lt;fct&gt;,
-## #   year &lt;int&gt;
+##   species island bill_length_mm bill_depth_mm flipper_length_~ body_mass_g sex  
+##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt; &lt;fct&gt;
+## 1 Adelie  Torge~           39.1          18.7              181        3750 male 
+## 2 Adelie  Torge~           39.5          17.4              186        3800 fema~
+## 3 Adelie  Torge~           40.3          18                195        3250 fema~
+## 4 Adelie  Torge~           NA            NA                 NA          NA &lt;NA&gt; 
+## 5 Adelie  Torge~           36.7          19.3              193        3450 fema~
+## 6 Adelie  Torge~           39.3          20.6              190        3650 male 
+## # ... with 1 more variable: year &lt;int&gt;
 ```
 
 Notice we cannot "see" all of the data - some columns hidden? The data is in a `tibble` data "class"
@@ -119,20 +118,19 @@ tail(penguins, 10)
 
 ```
 ## # A tibble: 10 x 8
-##    species island bill_length_mm bill_depth_mm flipper_length_~
-##    &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;
-##  1 Chinst~ Dream            50.2          18.8              202
-##  2 Chinst~ Dream            45.6          19.4              194
-##  3 Chinst~ Dream            51.9          19.5              206
-##  4 Chinst~ Dream            46.8          16.5              189
-##  5 Chinst~ Dream            45.7          17                195
-##  6 Chinst~ Dream            55.8          19.8              207
-##  7 Chinst~ Dream            43.5          18.1              202
-##  8 Chinst~ Dream            49.6          18.2              193
-##  9 Chinst~ Dream            50.8          19                210
-## 10 Chinst~ Dream            50.2          18.7              198
-## # ... with 3 more variables: body_mass_g &lt;int&gt;, sex &lt;fct&gt;,
-## #   year &lt;int&gt;
+##    species island bill_length_mm bill_depth_mm flipper_length_~ body_mass_g
+##    &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt;
+##  1 Chinst~ Dream            50.2          18.8              202        3800
+##  2 Chinst~ Dream            45.6          19.4              194        3525
+##  3 Chinst~ Dream            51.9          19.5              206        3950
+##  4 Chinst~ Dream            46.8          16.5              189        3650
+##  5 Chinst~ Dream            45.7          17                195        3650
+##  6 Chinst~ Dream            55.8          19.8              207        4000
+##  7 Chinst~ Dream            43.5          18.1              202        3400
+##  8 Chinst~ Dream            49.6          18.2              193        3775
+##  9 Chinst~ Dream            50.8          19                210        4100
+## 10 Chinst~ Dream            50.2          18.7              198        3775
+## # ... with 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
 ```
 
 From `help(tail)` page:
@@ -630,7 +628,7 @@ summary(tab1)
 |&amp;nbsp;&amp;nbsp;&amp;nbsp;Mean (SD) | 15.875 (1.821)  | 18.344 (1.133)  |  18.429 (1.339)  | 17.151 (1.975)  |        |
 |&amp;nbsp;&amp;nbsp;&amp;nbsp;Range     | 13.100 - 21.100 | 15.500 - 21.200 | 15.900 - 21.500  | 13.100 - 21.500 |        |
 
-.footnote[Learn more about the arsenal package and tabeby() function at [https://cran.r-project.org/web/packages/arsenal/vignettes/tableby.html](https://cran.r-project.org/web/packages/arsenal/vignettes/tableby.html).]
+.footnote[Learn more about the `arsenal` package and `tableby()` function at [https://cran.r-project.org/web/packages/arsenal/vignettes/tableby.html](https://cran.r-project.org/web/packages/arsenal/vignettes/tableby.html).]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
