@@ -1,0 +1,394 @@
+---
+title: "Text Wrangling"
+author: "Vicki Hertzberg"
+date: "2/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Working with Text
+
+Machines ==> Good at storing text, not so good at understanding text
+
+Humans ==> Good at understanding text, not so good at storing text
+
+To process text, you need an extra set of wrangling skills. We are now going to introduce how to 
+- _ingest_ text
+- create _corpora_ (collections of text document)
+- use _regular expressions_ to automate text searches 
+
+First let's call up the packages we will need:
+
+```{r}
+
+library(RCurl); packageVersion("RCurl")
+library(tidyverse); packageVersion("tidyverse")
+library(stringr); packageVersion("stringr")
+library(rvest); packageVersion("rvest")
+library(methods); packageVersion("methods")
+library(tm); packageVersion("tm")
+library(wordcloud); packageVersion("wordcloud")
+library(RColorBrewer); packageVersion("RColorBrewer")
+library(janitor); packageVersion("janitor")
+library(tidytext); packageVersion("tidytext")
+
+
+```
+
+
+We are going to use text mining techniques to explore the play _The Tragedy of Hamlet, Prince of Denmark_, aka _Hamlet_. To do this, we are going to pull the text from the Project Gutenberg site, (http://www.gutenberg.org)[http://www.gutenberg.org]. Project Gutenberg has over 53,000 electronic books and other text documents that you can download _for free_.
+
+```{r}
+
+# Get the text of Hamlet
+
+# We have called the package RCurl previously to allow us to call the URL
+hamlet_url <- "http://www.gutenberg.org/cache/epub/1787/pg1787.txt"
+Hamlet_raw <- RCurl::getURL(hamlet_url)
+
+```
+
+Note that the object `Hamlet_raw` is a *single string* of text containing the entire play. 
+
+To work with this, we are going to have to split this string into a vector of strings, and we will do this using the function `strsplit()`. We will also have to specify the end of line character(s), which in this case are: `\r\n`.
+
+```{r}
+
+# split string at end of line codes (\r\n); this returns a list - we only want the first element in the list
+hamlet <- strsplit(Hamlet_raw, "\r\n")[[1]]
+length(hamlet)
+
+```
+Now let's examine the text:
+
+```{r}
+#examine the text - list out some elements
+hamlet[350:360]
+```
+
+Notice that in this new `hamlet` object there are two spaces between the start of a line, then an abbreviation for the speaker's name, then another space. We can take advantage of this and other patterns to quantify the ideas within the text. As an example, let's see how many times Hamlet speaks.
+
+```{r}
+
+# get the number of lines that Hamlet speaks
+hamlet_lines <- grep("  Ham. ", hamlet, value = TRUE)
+length(hamlet_lines)
+
+# inspect the data
+head(hamlet_lines)
+```
+
+Look at the difference if we don't consider the space after the abbreviation in our expression to evaluate:
+
+```{r}
+
+# get the number of lines that Hamlet speaks
+hamlet_lines <- grep("  Ham.", hamlet, value = TRUE)
+length(hamlet_lines)
+
+# inspect the data
+head(hamlet_lines)
+```
+
+We will see that happens down below. 
+
+The `grep()` function is what you use when you want to use R to find a needle in a haystack. The first argument to the function is a _regular expression_ (i.e., a pattern) that you want to find, and the second argument is the character vector in which you want to find the patterns. Note that if you do not include "value = TRUE", the function will return the indices of the haystack in which the needles were found. To illustrate, let's look for Ophelia's lines;
+
+```{r}
+
+# find Ophelia's lines
+ophelia_lines <- grep(" Oph. ", hamlet)
+length(ophelia_lines)
+head(ophelia_lines)
+```
+
+The function `grepl()` uses the same syntax but returns instead a logical vector as long as the haystack. For example,
+
+```{r}
+
+#illustrate differences between grep and grepl
+length(grep("  Ham. ", hamlet))
+length(grepl("  Ham. ", hamlet))
+```
+
+To extract the piece of each matching line that actually matched, use the `str_extract()` function from the `stringr` package.
+
+```{r}
+
+# Extract the lines that match
+# To do this you need to have called up the package stringr
+pattern <- "  Ham. "
+grep(pattern, hamlet, value = TRUE) %>%
+  str_extract(pattern) %>%
+  head()
+
+```
+
+*Regular expressions* are very powerful and very commonly used in many different environments. Understanding the concept of regular expressions will pay off in the long term.
+
+# Regular Expression Syntax
+
+- *.* is a metacharacter that matches any character. If you want to search for the literal values of a metacharacter, you have to use two backslashes in R.
+
+```{r}
+# Example of use of . as a metacharacter
+
+hamlet_lines <- grep("  Ham.", hamlet, value = TRUE)
+length(hamlet_lines)
+
+hamlet_lines <- grep("  Ham. ", hamlet, value = TRUE)
+length(hamlet_lines)
+
+hamlet_lines <- grep("  Ham\\.", hamlet, value = TRUE)
+length(hamlet_lines)
+
+```
+
+- *Character sets:* Use brackets to define sets of characters to match.
+
+```{r}
+
+# Example os use of character sets
+
+head(grep("H[b-z]", hamlet, value = TRUE))
+```
+
+This notation will result in each occurrence of H followed by any small letter except "a".
+
+- *Alternation:* For this we use the symbol `|` within parentheses.
+
+```{r}
+
+# Example of alternation
+
+head(grep("  H(a|o)", hamlet, value = TRUE))
+
+```
+
+So you see that using the `  H(a|o)` alternation allows us to pick up any lines in which occurs the sequence "  Ha" or "  Ho".
+
+- *Anchors:* Use `^` to anchor a pattern to the beginning of a text, and use `$` to anchor it to the end.
+
+```{r}
+
+# Example of anchor at the beginning
+head(grep("^  H[b-z]", hamlet, value = TRUE))
+
+```
+
+- *Repetitions:* Specify the number of times that we want a certain pattern to occur.
+
+    - `?` means zero or one time
+    - `*` means zero or more times
+    - `+` means one or more times
+    
+```{r}
+
+# Examples of repetitive patterns
+
+head(grep("  $H(a|o)", hamlet, value = TRUE))
+
+```
+
+```{r}
+
+# Examples of repetitive patterns
+
+head(grep("  *H(a|o)", hamlet, value = TRUE))
+```
+
+```{r}
+
+# Examples of repetitive patterns
+
+head(grep("  +H(a|o)", hamlet, value = TRUE))
+```
+
+So how do we use these techniques to analyze the text?
+
+- What can we learn by noting who speaks when?
+_ When does each character speak as a function of the line number in the play?
+
+
+```{r}
+
+# Assign the characters
+Hamlet <- grepl("  Ham\\.", hamlet)
+Ophelia <- grepl("  Oph\\.", hamlet)
+Polonius <- grepl("  Pol\\.", hamlet)
+Gertrude <- grepl("  Queen\\.", hamlet)
+Laertes <- grepl("  Laer\\.", hamlet)
+Claudius <- grepl("  King\\.", hamlet)
+Horatio <- grepl("  Hor\\.", hamlet)
+Fortinbras <- grepl("  For\\.", hamlet)
+
+length(Hamlet)
+length(Ophelia)
+length(Polonius)
+length(Gertrude)
+length(Laertes)
+length(Claudius)
+length(Horatio)
+length(Fortinbras)
+
+sum(Hamlet)
+sum(Ophelia)
+sum(Polonius)
+sum(Gertrude)
+sum(Laertes)
+sum(Claudius)
+sum(Horatio)
+sum(Fortinbras)
+
+
+```
+
+Before we can use these data, we want to convert the *logical* vectors into *numeric* vectors, then tidy the data. There is also a bunch of unwanted text at the beginning and end of the raw text, and we want to get rid of it so that our analyses just pertain to the corpus of the play itself, which starts at line 274 and extends to line 5130.
+
+```{r}
+
+# Let's tidy up the dataset
+# Naturally we need to have called up the tidyverse package for this to work
+
+speaker_freq <- data.frame(Hamlet, Polonius, Claudius, Horatio, Ophelia, Gertrude, Laertes) %>%
+  mutate(line=1:length(hamlet)) %>%
+  gather(key = "character", value = "speak", -line) %>%
+  mutate(speak = as.numeric(speak)) %>%
+  filter(line > 273 & line < 5131)
+
+glimpse(speaker_freq)
+  
+```
+
+Another thing to do before we do the deep dive: Let's create some context of helpful information, namely the lines at which each Act starts and stops.
+
+```{r}
+
+# Delineate the Acts
+acts_idx <- grep("^A[C|c][T|t] [I|V]+", hamlet)
+acts_labels <- str_extract(hamlet[acts_idx], "^A[C|c][T|t] [I|V]+")
+acts <- data.frame(line=acts_idx, labels = acts_labels)
+
+```
+
+Now let's see when these 4 characters are speaking throughout the play:
+
+```{r}
+
+# Plot the lines at which each character speaks
+ggplot(data = speaker_freq, aes(x=line, y=speak)) +
+  geom_smooth(aes(color=character), method = "loess", se = 0, span = 0.4) +
+  geom_vline(xintercept = acts_idx, color = "darkgray", lty = 3) +
+  geom_text(data = acts, aes(y=0.085, label = labels), hjust = "left", color = "darkgray") +
+  ylim(c(0, NA)) +
+  xlab("Line Number") +
+  ylab("Proportion of Speeches")
+
+```
+
+We can also ingest text by scraping it from the internet. Let's look at the discography of David Bowie, as listed on Wikipedia:
+
+
+Get the data
+
+```{r}
+
+url <- "https://en.wikipedia.org/wiki/List_of_songs_recorded_by_David_Bowie"
+tables <- url %>% 
+  read_html() %>% 
+  html_nodes("table")
+Bowie_songs <- tables %>%
+  purrr::pluck(3) %>%
+  html_table(fill = TRUE) %>%
+  janitor::clean_names() %>%
+  select(song, writer_s, year)
+glimpse(Bowie_songs)
+
+```
+
+First let's clean this up a bit more.
+
+```{r}
+
+# Clean the data
+
+Bowie_songs <- Bowie_songs %>%
+  mutate(song = gsub('\\"', "", song), year = as.numeric(year)) 
+
+glimpse(Bowie_songs)
+
+```
+
+It appears that Bowie recorded 400 songs. Who wrote all of them?
+
+```{r}
+
+# Count the number of different songwriters
+pattern <- "Bowie"
+Bowie_songs$bowie_wrote <- grepl(pattern, Bowie_songs$writer_s)
+sum(Bowie_songs$bowie_wrote)
+
+
+```
+
+Such a prolific writer, what was he writing about? 
+
+First restrict to just the 337 songs for which he is a writer.
+
+```{r}
+
+Bowie_songs %>% filter(bowie_wrote == "TRUE") -> Bowie_songs_only
+
+```
+
+So what did Bowie write about?
+
+```{r}
+
+Bowie_songs_only %>%
+  unnest_tokens(word, song) %>%
+  anti_join(get_stopwords(), by = "word") %>%
+  count(word, sort = TRUE) %>%
+  arrange(desc(n))  -> Bowie_words
+
+```
+
+
+
+
+
+```{r}
+
+#Get rid of parentheses and words in between
+Bowie_songs_only$song <- gsub(" *\\(.*?\\) *","",as.character(Bowie_songs_only$song))
+
+# Get rid of square brackets and words in between (used by Wikipedia to denote footnotes)
+Bowie_songs_only$song <- gsub(" *\\[.*?\\] *","",as.character(Bowie_songs_only$song))
+
+# Get rid of leading and trailing whitespace
+Bowie_songs_only$song <- trimws(Bowie_songs_only$song, "both")
+
+Bowie_songs_only %>%
+  select(song) %>%
+  unnest_tokens(word, song) %>%
+  anti_join(get_stopwords(), by = "word") %>%
+  count(word, sort = TRUE) %>%
+  arrange(desc(n)) -> Bowie_words
+
+```
+
+Another way to look at text is to create a _word cloud_, which you can think of as a multivariate histogram for words. You will be surprised, I'm sure, to learn that R has a `wordcloud` package that will allow you to create this object.
+
+
+```{r}
+
+# Create wordcloud from Bowie song titles
+
+#We need to have the package wordcloud and RColorBrewer for this to work.
+wordcloud(words = Bowie_words$word, freq = Bowie_words$n, max.words = 30, scale = c(4, 1), colors = topo.colors(n=30), random.color = TRUE)
+
+```
+

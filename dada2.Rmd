@@ -1,0 +1,794 @@
+---
+title: "dada2 lecture"
+author: "Vicki Hertzberg"
+date: "3/3/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Please note that I have very liberally borrowed from Ben Callahan's dada2 tutorial in creating this lesson.
+
+# Analyzing Microbiome Data
+
+Some of you are here today because you have an interest in the microbiome, that "new organ" comprising the trillions of microbes that live in and on us. Today we are going to talk about how to identify these organisms isolated from a sample by sequencing a portion of the genetic material present, lining these up into counts of organisms, then using these data to summarize the microbes present in numeric or graphical fashion.
+
+Before we get to that I just have one short message: (https://www.youtube.com/watch?v=htbeJhtFAXw)[https://www.youtube.com/watch?v=htbeJhtFAXw]
+
+We will proceed as follows:
+
+1. We will be briefly discussing the concept of metagenomics in general, and the 16S region of the bacterial genome in particular.
+
+2. We will next discuss sequencing the .fastq file format. We are talking about .fastq files to give you an idea of what is coming out of the sequencer, why there is uncertainty, and why this is all so darned complicated.
+
+3. We will walk through an example of processing a set of forward and reverse .fastq files to come up with something akin to an OTU table.
+
+4. We will next use our "OTU table" together with data about our samples to produce numerical and visual descriptive summaries of our samples. 
+
+5. We will end by again using this "OTU table" and our sample data to develop functional profiles of our samples.
+
+## Metagenomics
+
+_Genomics, Proteomics, Transcriptomics_
+
+- These focus on the *whole* of a *single* individual organism.
+- But organisms live in communities and interact.
+- To study a community, we need to study across the genomes of the individual organisms comprising it.
+
+_Metagenomics_
+
+- The study of metagenomes, genetic material sampled directly from a community in its natural environment.
+- Obviates the need for isolation and lab cultivation.
+
+There are several methods for characterizing metagenomes. Some of these involve sequencing amplified markers, "amplicons" of eukaryotic genomes. For bacteria and archaeae, these are typically highly conserved small subunits of the gene that encodes for ribosomal RNA, in particular the 5S, 16S, 18Sm or 23S regions. For instance, the 16S rRNA unit, about 1500 base pairs in length, has 9 hypervariable regions. For fungi, the ITS unit serves this purpose. You can design an experiment so that you target one of those regions, or you can sequence the whole 16S region. Your choice of primers (and budget) will determine how much you sequence. 
+
+Alternatively you can perform whole genome sequencing (WGS), sometimes also called "shotgun" sequencing, to determine the whole bacterial genome. WGS is about 10 times more  expensive then 16S sequencing.
+
+_16S rRNA_
+
+Universal PCR primers are used to amplify this region. Primers have been designed to match highly conserved regions of this subunit. A 2-D representation of the 16S region for the *Thermus thermophilus*, an extremophile bacteria, can be found at (http://rna.ucsc.edu/rnacenter/images/figs/thermus_16s_2ndry.jpg)[http://rna.ucsc.edu/rnacenter/images/figs/thermus_16s_2ndry.jpg]
+
+_V4 Hypervariable Region_
+
+Universal primers:
+
+- Forward (515F): GTGCCAGCMGCCGCGGTAA
+- Reverse (805R): GGACTACHVGGGTWTCTAA
+- These will produce 288 - 290 bp amplicons covering the V4 region
+
+Sequences determined by Illumina MiSeq protocol
+
+- Should get nearly complete overlap of forward and reverse reads.
+- These can be merged to form a high quality consense base call at each position.
+- Then classify the merged reads.
+
+#_Wait! I thought that the only letters allowed in the sequences are A, C, G, or T._ 
+Yet I see M, H, V, and W in those primer sequences. What's up with that?
+
+It turns out that the Illumina is smart enough to know what it doesn't know. So if it knows the base, it calls it that way. OTOH, if it can only resolve the base call down to, say, the choice of 2 bases, it uses these other letters to designate that situation. These are called the IUPAC Ambiguity Codes, and you can see them here: (http://droog.gs.washington.edu/parc/images/iupac.html)[http://droog.gs.washington.edu/parc/images/iupac.html]. There is another IUPAC code not included on the table, and that is "-", which is used to indicate a gap, an often useful indicator for alignments.
+
+
+## Sequencing File Format
+
+In the files produced by the sequencer, every read represents an independent copy of source DNA in your sample. When the target material is sequenced, there are two main considerations: sequencing *breadth* and sequencing *depth*.
+
+- _Breadth_ refers to the extent to which you sequence the entire genome present. You want to be sure that you have sequence information for all areas of the target.
+- _Depth_ refers to how many reads on average cover each base pair of your target. This is also sometimes referred to as "coverage."
+
+- In 16s rRNA amplicon sequencing, the primers that you use determine breadth. 
+- If you don't have sufficient depth you may end up with incomplete or inconclusive results. OTOH, oversequencing raises costs. 
+
+
+
+### Illumina FASTQ Files
+
+#### File Naming Conventions:
+
+- NA10831_ATCACG_L002_R1_001.fastq.gz 
+- FA1_S1_L001_R1_001.fastq.gz 
+- Sample_Barcode/Index_Lane_Read#_Set#.fastq.gz
+
+#### Sequence Identifiers
+
+- \@EAS139:136:FC706VJ:2:5:1000:12850 1:N:18:ATCACG 
+- \@M00763:36:000000000-A8T0A:1:1101:14740:1627 1:N:0:1
+- \@Instrument : Run# : FlowcellID : Lane : Tile : X : Y Read : Filtered : Control# : Barcode/Index
+
+#### FASTQ File Format
+
+| 4 lines per read as follows: |
+|------------------------------|
+| \@sequence_id                |
+| sequence                     |
+| \+                           |
+| quality                      |
+|------------------------------|
+
+
+
+#### Example
+ 
+
+- Line1: \@M00763:36:000000000-A8T0A:1:1101:14740:1627 1:N:0:1
+
+- Line2: CCTACGGGAGGCAGCAGTGGGGAATATTGCACAATGGGGGAAACCCTGATGC AGCGACGCCGCGTGAGTGAAGAAGTATCTCGGTATGTAAAGCTCTATCAGCA GGAAAGATAATGACGGTACCTGACTAAGAAGCCCCGGCTAACTACGTGCCAG CAGCCGCGGTAATACGTAGGGGGCAAGCGTTATCCGGATTTACTGGGTGTAA AGGGAGCGTAGACGGCAGCGCAAGTCTGGAGTGAAATGCCGGGGCCCAACCC 
+CGGCCCTGCTTTGGAACCCGTCCCGCTCCAGTGCGGGCGGG
+
+- Line3: \+ 
+
+- Line 4: 88CCCGDBAF)===CEFFGGGG>GGGGGGCCFGGGGGDFGGGGDCFGGGFED CFG:\@CFCGGGGGGG?FFG9FFFGG9ECEFGGGDFGGGFFEFAFAFFEFECE F\@4AFD85CFFAA?7+C\@FFF<,A?,,,,,,AFFF77BFC,8>,>8D\@FFFF G,ACGGGCFG>\*57;\*6=C58:?<)9?:=:C\*;;\@C?3977\@C7E\*;29>/= +2\*\*)75):17)8\@EE3>D59>)>).)61)4>(6\*+/)\@F63639993??D1 :0)((,((.(.+)(()(-(\*-(-((-,,(.(.)),(-0)))
+
+#### Quality Scores
+
+The 4th line consists of the Phred scores for each base call. Each character is associated with a value between 0 and 40, and these are called the Quality scores or Q scores. The coding scheme can be found at (https://support.illumina.com/help/BaseSpace_OLH_009008/Content/Source/Informatics/BS/QualityScoreEncoding_swBS.htm)[https://support.illumina.com/help/BaseSpace_OLH_009008/Content/Source/Informatics/BS/QualityScoreEncoding_swBS.htm]  
+
+The relationship is as follows:
+
+\begin{equation}
+Q=-10*log(p)
+\end{equation}
+
+Or you can solve for p as follows:
+
+\begin{equation}
+p=10^{-Q/10}
+\end{equation}
+
+You can see from the table that letters have high Quality Scores. Let's look at the Phred score of I, which has a Q value of 40. 
+
+|                |
+|----------------|
+| Q=40           |
+| -Q/10 = -4     |
+| p = $10^{-4}$|
+| p = 0.0001     |
+
+
+In contrast, consider when the Phred score is "+", the Q value is 10, and p = 0.10.
+
+In summary, if you are looking at the .fastq file (which you can open with a text editor), letters are good, numbers are medium, and most anything else is of lesser quality.
+
+You want to know this because you may want to trim your sequences. Sometimes when a sequence is read, the first 10 or so sequences are of lesser quality. Also, reads deteriorate in quality towards the end of a sequence. Finally, forward reads are generally of better quality than their corresponding reverse reads.
+
+### Processing Sequencing Data: Overview
+
+1. Filter - remove low-quality reads and non-target sequences
+2. Trim - prune low-quality ends
+3. Assembly - correct overlapping bases
+4. Aggregate - combine similar reads
+5. Chimeras - remove chimeric reads
+
+## Processing Sequencing Data with the DADA2 Pipeline
+
+Today we are going to go through the process of "feeding" a set of Illumina-sequenced paired-end .fastq files into the `dada2` package, with the goal of deriving a _sequence table_ in the end. The term "dada" stands for Divisive Amplicon Denoising Algorithm. This R package example uses 4 dada steps, 2 for the forward reads and 2 for the reverse reads, hence "dada2."
+
+A sequence table is akin to the ubiquitous OTU table, only it is at a much higher resolution.  OTUs, or operational taxonomic units, is an operational term defined as sets of individual organisms that have been put together in groups according to their DNA similarity. OTUs are often used as proxies for "species". "Similarity" in this context is defined as differing by no more than a fixed dissimilarity threshold, typically set at 3%. But we are going to do better than 3% dissimilarity; we are headed to 100%. 
+
+Why isn't 97% good enough?
+
+1. It still is low resolution, fiving genus level identification at best
+2. It tends to have a high false positive rate, with the number of OTUs much greater than actual richness.
+3. As you get more samples, the processing time scales up super-linearly.
+
+We are using `dada2` because it infers sample sequences exactly, resolving differences of as little as one (1) nucleotide. Not only does `dada2` provide higher resolution, it also performs better than two other major players in this field: mothur and QIIME (v1). But note that QIIME v2.1 now has a DADA2 step built into it, so it should now compete well with this package. 
+
+For the moment, however, we are going to continue to use `dada2`, well, because. Because we are now expert R, RStudio, git and github users, that's why!!!
+
+#### First Note of Importance
+
+Our "input" into the package is a set of Illumina-sequenced paired-end .fastq files that have been demultiplexed (i.e., split by sample) and _from which the barcodes/adapters/primers have already been removed._  In this toy dataset all of these barcoode/adapters/primers have been removed. But when it comes to processing your own data, you will have to check this before you proceed. 
+
+My personal experience to with two different labs is that you will receive demultiplexed files with the barcodes removed, *but* the primers have not been removed. You will need to know that the primers are so that you can figure out the lengths. You can trim before hand with a program such as TRIMMOMATIC (http://www.usadellab.org/cms/?page=trimmomatic)[http://www.usadellab.org/cms/?page=trimmomatic]. This way, when we display the quality plots later you will be seeing the quality of the "meat" of your data, instead of having some distraction with the quality of the sequences including the primers. 
+
+You can also trim later by setting an option. I will show you (outside of an R chunk of course, because these data have already had the primers trimmed) how to do that.
+
+#### Second Note of Importance
+
+This pipeline also assumes that if you have paired reads, that the forward and reverse .fastq files contain the reads in matching order.
+
+If this is not true, you will need to remedy this before proceeding. Please see the `dada2` FAQ for suggestions: (http://benjjneb.github.io/dada2/faq.html#what-if-my-forward-and-reverse-reads-arent-in-matching-order)[http://benjjneb.github.io/dada2/faq.html#what-if-my-forward-and-reverse-reads-arent-in-matching-order].
+
+##### End of Notes of Importance. For the Moment.
+
+
+
+
+So let's get started now.
+
+### Are We Ready?
+
+Let's check that all is ready.
+
+```{r}
+library(dada2); packageVersion("dada2")
+library(ShortRead); packageVersion("ShortRead")
+library(phyloseq); packageVersion("phyloseq")
+library(ggplot2); packageVersion("ggplot2")
+library(DECIPHER); packageVersion("DECIPHER")
+sessionInfo()
+```
+
+I have also downloaded the file used in the Mothur MiSeq SOP, as well as two RDP reference files. The Mothur MiSeq files contain data from an experiment in which the V4 region of the 16S rRNA gene in mice feces was sequenced.  You will have to change the path in the next chunk to the path to where your files sit. Also if you are on a Windows machine, this will also look different. Let's make sure they are all in the proper place on my machine:
+
+```{r}
+# Set the path to the data files
+path <- "~/Documents/NRSG_741/MiSeqData/MiSeq_SOP"
+fileNames <- list.files(path)
+fileNames
+```
+
+OK, I see 38 .fastq files and the two SILVA V132 files. With the exception of the two SILVA files (which we list but the `dada2` tutorial does not), we agree. The file named "filtered" will be created in another couple of steps, so we are not going to worry about that.
+
+### Filter and Trim
+
+So now we are ready to use the `dada2` pipeline. We will first read in the names of the .fastq files. Then we will manipulate those names as character variables, using regular expressions to create lists of the forward and reverse read .fastq files in *matched* order.
+
+```{r}
+# Forward and reverse fastq filenames have format: SAMPLENAME_R1_001.fastq and SAMPLENAME_R2_001.fastq
+# Read in the names of the .fastq files
+
+fnFs <- sort(list.files(path, pattern="_R1_001.fastq", full.names=TRUE))
+fnRs <- sort(list.files(path, pattern="_R2_001.fastq", full.names=TRUE))
+
+# Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
+
+sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
+  
+  
+
+
+
+
+```
+
+#### Important Note 3
+
+If you are using this workflow with your own data, you will probably need to modify the R chunk above, especially the assignment of sample names to the variable `sample.names`.
+
+#### End of Note
+
+### Quality Profiles of the Reads
+
+One of the points that we have repeatedly emphasized in this class is the importance of visualizing your data, and that process is still important with this type of data. Fortunately there is a great quality profile plot that you can generate with just a single command from `dada2`.
+
+```{r}
+# Visualize the quality profile of the first two files containing forward reads
+
+plotQualityProfile(fnFs[1:2])
+
+
+```
+
+We see here that the forward reads are really good quality. Callahan advises "trimming the last few nucleotides to avoid less well-controlled errors that can arise there." OTOH, Christopher Taylor, who runs the Metagenomics lab at LSU Health Sciences Center advises to always trim the first 10 reads. 
+
+Let's look at the reverse reads.
+
+```{r}
+# Visualize the quality profile of the first two files containing reverse reads
+
+plotQualityProfile(fnRs[1:2])
+
+```
+
+The quality of the reverse reads is subtantially worse, especially toward the end, a common phenomenon with Illumina paired-end sequencing. The dada algorithm incorporates error quality into the model, so it is robust to lower quality sequences, but trimming is still a good idea.
+
+If you are using your own data, make sure that you have good overlap, the more the better.
+
+#### Performing the Filtering and Trimming
+
+We will use typical filtering parameters.
+
+- `maxN = 0` -- `dada2` requires that there be no N's in a sequence
+- `truncQ = 2` -- truncate reads at the first instance of a quality less than or equal to \code{truncQ}#.
+- `maxEE` = 2 -- sets the maximum number of expected errors allowed in a read, which is a better filter than simply averaging quality scores.
+
+Let's jointly filter the forward and reverse reads with the fastqPairedFilter function.
+
+
+
+```{r}
+# Make a directory and filenames for the filtered fastqs
+ 
+# Place filtered files in a filtered/ subdirectory
+filt.path <- file.path(path, "filtered")
+if(!file_test("-d", filt.path)) dir.create(filt.path)
+filtFs <- file.path(filt.path, paste0(sample.names, "_F_filt.fastq.gz"))
+filtRs <- file.path(filt.path, paste0(sample.names, "_R_file.fastq.gz"))
+
+```
+
+Now filter the forward and reverse reads
+
+```{r}
+
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen = c(240, 160),
+                     maxN=0, maxEE =c(2,2), truncQ = 2, rm.phix = TRUE,
+                     compress=TRUE, multithread=TRUE) #On Windows set multithread=FALSE
+
+head(out)
+
+```
+
+
+
+#### Important Note 4
+
+Standard filtering parameters as shown here are guidelines, i.e., they are not set in stone. For example, if too few reads are passing the filter, consider relaxing `maxEE`, perhaps especially on the reverse reads, (e.g., `maxEE=c(2,5)`). If you want to speed up downstream computation and have fewer reads pass the filter, consider tightening `maxEE` (e.g., `maxEE=c(1,1)`). For paired-end reads consider the length of your amplicon when choosing `truncLen` as you reads MUST OVERLAP after truncation in order to merge later.
+
+#### End of Note
+
+
+### Learn the Error Rates
+
+The `dada2` algorithm uses a parametric error model (`err`), and, of course, the amplicon dataset will have different error rates. The algorithm will learn its error model from the data by alternating estimation of error rates and composition of the sample until convergence of the sample on a jointly consistent solution (like the EM algorithm, if you happen to know that) (and if you don't, it does not matter).
+
+So we will run this joint inference 4 times. The first passes will be through the forward and reverse reads setting `selfConsist = TRUE`. The second passes will be through the forward and reverse reads with the learned error structure. On the first pass, the algorithm starts with an initial guess, which is that the maximum possible error rates in these data, that is, the error rates if only the most abundant sequence is correct, and all the rest are errors. This is what happens when we set `err=NULL`.
+
+Let's take a 5 minute break while we take the first pass through the Forward reads then the Reverse reads:
+
+```{r}
+errF <- learnErrors(filtFs, multithread = TRUE)
+errR <- learnErrors(filtRs, multithread = TRUE)
+```
+
+
+
+Finally it is always worthwhile to visualize the estimated error rates:
+
+```{r}
+# Plot the estimated error rates for the Forward reads
+
+plotErrors(errF, nominalQ=TRUE)
+
+# And for the Reverse reads
+
+plotErrors(errR, nominalQ = TRUE)
+
+
+```
+
+The error for each possible type of transition (i.e., A -> C, A -> T, ..., T -> G) are shown. The black points are the observed error rates for each consensus quality score. The black line shows the estimated error rates after convergence. The red line is the error rates expected under the nominal definition of the Q value. You see that the black line (estimated rates) fots the observed rates well, and the error rates drop with increased quality as expected. So all is looking good and we proceed.
+
+
+
+### Dereplication
+
+You can gain further efficiencies by dereplicating the reads, ths is combining all identical sequences so that all you are left with is a list of "unique sequences" and a count of them, defined as the "abundance". Other pipelines can do this too to gain efficiency, but `dada2` retains a summary of the quality information associated with each unique sequence, developing a consensus quality profile as the average of the positional qualities from the dereplicated reads, which it then uses to inform the error model in the subsequent denoising step.
+
+```{r}
+# Dereplicate
+
+derepFs <- derepFastq(filtFs, verbose=TRUE)
+derepRs <- derepFastq(filtRs, verbose=TRUE)
+
+# Name the derep-class objects by the sample names
+names(derepFs) <- sample.names
+names(derepRs) <- sample.names
+```
+
+
+#### If using your own data
+
+If you have a a big dataset, get the initial error rate estimates from a subsample of your data.
+
+
+
+
+### Sample Inference
+
+We are now ready to infer the sequence variants in each sample (second dada pass)
+
+```{r}
+# First with the Forward reads
+
+dadaFs <- dada(derepFs, err = errF, multithread = TRUE)
+
+# Then with the Reverse reads
+
+dadaRs <- dada(derepRs, err = errR, multithread = TRUE)
+
+# Inspect the dada-class objects returned by the dada function
+
+dadaFs[[1]]
+dadaRs[[1]]
+
+```
+
+We can see that the algorithm has inferred 128 unique sequence variants from the forward reads and 119 from the reverse reads. 
+
+### Merge Paired Reads
+
+We can eliminate further spurious sequence variants by merging overlapping reads. The core function is `mergePairs` and it depends on the forward and reverse reads being in matching order at the time they were dereplicated.
+
+```{r}
+
+# Merge the denoised forward and reverse reads
+
+mergers <- mergePairs(dadaFs, derepFs, dadaRs, derepRs, verbose = TRUE )
+
+# Inspect the merged data.frame from the first sample
+
+head(mergers[[1]])
+
+```
+
+We now have a `data.frame` object for each sample with the merged `$sequence`, its `$abundance`, and the indices of the merged `$forward` and `$reverse` denoised sequences. Pair reads that did not precisely overlap have been removed by the `mergePairs` function.
+
+#### Important Note 5
+
+
+If doing this with your own data, most of your reads should successfully merge. If this is not the case, you will need to revisit some upstream parameters. In particular, make sure you did not trim away any overlap between reads.
+
+#### End of Note
+
+### Sequence Table Construction
+
+We will now construct the sequence table, this being analogous to the "OTU table" produced by other methods.
+
+```{r}
+
+# Construct sequence table
+
+seqtab <- makeSequenceTable(mergers)
+
+# Consider the table
+
+dim(seqtab)
+class(seqtab)
+
+# Inspect the distribution of sequence lengths
+
+table(nchar(getSequences(seqtab)))
+
+
+```
+
+We see that the sequence table is a `matrix` with rows corresponding to and named by the samples, and columns corresponding to and named by the sequence variants. We also see that the lengths of all of the sequences fall in the range expected for V4 amplicons.
+
+#### Important Note 6
+
+If working with your own data you may find sequences that are much longer or much shorter than expected. These may be the result of non-specific priming, and you should consider removing them. Use the command `seqtab2 <- seqtab[,nchar(colnames(seqtab)) %in% seq(250, 256)]`.
+
+#### End of Note
+
+### Remove Chimeras
+
+So far we have let the `dada` function remove substitution errors and indel errors, but chimeras remain. The accuracy of the sequences after denoising makes chimera identification easier than if we had done that earlier with "fuzzier" sequences because all sequences now can be exactly reconstructed as a bimera (two-parent chimera) from more abundant sequences.
+
+```{r}
+
+# Remove chimeric sequences
+
+seqtab.nochim <- removeBimeraDenovo(seqtab, method = "consensus", multithread = TRUE, verbose=TRUE)
+dim(seqtab.nochim)
+
+sum(seqtab.nochim)/sum(seqtab)
+
+```
+
+The fraction of chimeras can be substantial. In this example, chimeras account for 59/288 unique sequence variants, or about 20% of them, but these variants account for only about 4% of the total sequence reads.
+
+#### Important Note 7 
+
+Most of the _reads_ should remain after chimera removal, although it is not uncommon for a majority of _sequence variants_ to be removed. If most of your reads are removed as chimeric, you may need to revisit upstream processing. In almost all cases this is caused by primer sequences with ambiguous nucleotides that were not removed prior to beginning the DADA2 pipeline.
+
+#### End of Note
+
+
+
+### Track Reads through the Pipeline
+
+```{r}
+
+getN <- function(x) sum(getUniques(x))
+pctSurv <- rowSums(seqtab.nochim)*100/out[,1]
+track <- cbind(out, sapply(dadaFs, getN), sapply(mergers, getN), rowSums(seqtab), rowSums(seqtab.nochim), pctSurv)
+colnames(track) <- c("input", "filtered", "denoised", "merged", "tabled", "nonchimeric", "% passing")
+rownames(track) <- sample.names
+head(track)
+
+```
+
+
+
+
+
+### Assign Taxonomy
+
+Most people want to know the names of the organisms associated with the sequence variants, and so we want to classify them taxonomically. The package will use a classifier for this purpose, taking a set of sequences and a training set of taxonomically classified sequences, and outputs taxonomic assignments with at least `minBoot` bootstrap confidence. 
+
+There are many training sets to use. GreenGenes is one such set, but it has not been updated in 3 years. UNITED ITS and the Ribosomal Database Project (RDP) are others, the former being used for fungi. We are going to use a training set from SILVA. You should have downloaded that earlier and it should be sitting in the same folder as the original forward and reverse read files.
+
+```{r}  
+
+
+
+# Assign taxonomy
+
+# First initialize random number generator for reproducibility
+
+set.seed(100)
+getwd()
+path
+list.files(path)
+
+taxa <- assignTaxonomy(seqtab.nochim, "~/Documents/NRSG_741/MiSeqData/MiSeq_SOP/silva_nr_v132_train_set.fa.gz", multithread = TRUE)
+unname(head(taxa))
+```
+
+### Species Assignment
+
+We can also use the SILVA species assignment dataset to do exactly that, that is, to assign species.
+
+```{r}
+
+# Assign species
+
+taxa <- addSpecies(taxa, "~/Documents/NRSG_741/MiSeqData/MiSeq_SOP/silva_species_assignment_v132.fa.gz")
+
+
+```
+
+Here is an alternative taxonomic classification method available via the `DECIPHER` package from Bioconductor. You will need to download a new classifier dataset from [http://www2.decipher.codes/Downloads.html]{http://www2.decipher.codes/Downloads.html}, using the SILVA SSU r132 (modified) link near the bottom of the page.
+
+```{r}
+
+dna <- DNAStringSet(getSequences(seqtab.nochim)) #Create a DNAStringSet from the ASVs
+
+load(file.path(path,"SILVA_SSU_r132_March2018.RData")) #CHANGE TO WHERE YOU HAVE STORED THIS DATASET
+ids <- IdTaxa(dna, trainingSet, strand="top", processors = NULL, verbose = FALSE)
+ranks <- c("domain", "phylum", "class", "order", "family", "genus", "species") # ranks of interest
+# Convert the output object of class "Taxa" to a matrix analogous to the output from assignTaxonomy
+taxid <- t(sapply(ids, function(x) {
+        m <- match(ranks, x$rank)
+        taxa <- x$taxon[m]
+        taxa[startsWith(taxa, "unclassified_")] <- NA
+        taxa
+}))
+colnames(taxid) <- ranks; rownames(taxid) <- getSequences(seqtab.nochim)
+
+```
+
+If you want to use these new taxonomic assignments, set taxa <- taxid. Let's go ahead and do that:
+
+```{r}
+
+#taxa <- taxid #Don't do this if you want to use the original taxonomic assignments from the naive Bayes classifier employed by the dada2 assignTaxonomy and assignSpecies functions
+
+```
+
+
+
+Inspect the taxonomic assignments:
+
+```{r}
+
+taxa.print <- taxa #Removing sequence rownames for display only
+rownames (taxa.print) <- NULL
+head(taxa.print)
+
+```
+
+
+### Evaluate Accuracy
+
+
+In addition to the MiSeq_SOP files, we have also analyzed a "mock community", a mixture of 20 known strains. Reference sequences were provided in the downloaded zip archive. Let's see how the sequences inferred by DADA2 compare to the expected composition of the community.
+
+```{r}
+
+# Evaluate DADA2's accuracy on the mock community
+
+unqs.mock <- seqtab.nochim["Mock",]
+unqs.mock <- sort(unqs.mock[unqs.mock>0], decreasing=TRUE) #Drop ASVs absent in the Mock Community
+cat("DADA2 inferred", length(unqs.mock), "sample sequences present in the Mock Community. \n")
+
+mock.ref <- getSequences(file.path(path, "HMP_MOCK.v35.fasta"))
+match.ref <- sum(sapply(names(unqs.mock), function(x)any(grepl(x, mock.ref))))
+cat("Of those,", sum(match.ref), "were exact matches to the expected reference sequences. \n")
+
+```
+
+
+
+
+
+
+
+### Construct a Phylogenetic Tree
+
+Phylogenetic relatedness is often used to inform downstream analyses, particularly the calculation of phylogeny-aware distances between microbial communities, including the weighted and unweighted UniFrac distances. We can use the reference-free `dada2` sequence inference to construct the phylogenetic tree by relating the inferred sequence variants *de novo*. 
+
+```{r}
+
+seqs <- getSequences(seqtab.nochim)
+
+# This next command will allow propagation of sequence names to the tip labels of the tree
+names(seqs) <- seqs
+alignment <- AlignSeqs(DNAStringSet(seqs), anchor=NA)
+```
+
+Now that the sequences are aligned we can use the `phanghorn` package to construct the tree. 
+
+```{r}
+
+library(phangorn)
+
+# Construct the tree
+phang.align <- phyDat(as(alignment, "matrix"), type="DNA")
+dm <- dist.ml(phang.align)
+treeNJ <- NJ(dm) # Tip order will not equal sequence order
+fit <- pml(treeNJ, data=phang.align)
+
+## negative edges length changed to 0.
+
+fitGTR <- update(fit, k=4, inv=0.2)
+fitGTR <- optim.pml(fitGTR, model="GTR", optInv=TRUE, optGamma=TRUE, 
+                    rearrangement = "stochastic", control=pml.control(trace=0))
+detach("package:phangorn", unload=TRUE)
+
+```
+
+We will be viewing the tree below.
+
+### Prepare for Piphillin
+
+We are now in a position where we can prepare our output for uploading to Piphillin [http://www.secondgenome.com/solutions/resources/data-analysis-tools/piphillin/](http://www.secondgenome.com/solutions/resources/data-analysis-tools/piphillin/). Piphillin is a tool to infer function from 16S rRNA abundance. It takes the data (more ore less) directly from the sequence variant table that `dada2` produces. 
+
+You have to upload two items, a .fasta formatted file containing the representative sequences, and the sequence variant table (reformatted) to the webpage above, and it should return results to you in about 20 minutes.
+
+To do this we need to work with our `dada2` output a little bit more to create the .
+
+```{r}
+
+# create the fasta format file for piphillin
+
+fastseq <- colnames(seqtab.nochim)
+start <- as.character(seq(1:length(fastseq)))
+otustart <- paste(">otu", start, sep="")
+fsta <- c(rbind(otustart, fastseq))
+write(fsta, "example.fasta")
+
+# write out the transposed seqtab.nochim file in 
+# .csv format
+
+otulab <- paste("otu", start, seq="")
+stnct <-t(seqtab.nochim)
+
+rownames(stnct) <- otulab
+write.csv(stnct, "seqtab3.csv")
+
+
+
+# use seqtab3.csv and example.fasta 
+# as the input files for piphillin
+
+```
+
+Once you have these two files exported, use a text editor to open the .csv file, and change the first line to start with "OTU,samplename1,samplename2,etc.".
+
+Then go to the website above, fill out the form, upload these files, and submit the request. Choose to get both KEGG and BIOCYC results from the latest available databases, and ask for 99% accuracy. You will get an emailed response in about 20 minutes with a link to your results. Download those results immediately (the link and results will disappear in 24 hours). Unzipe the file, and look in each of the _output folders. There should be some .txt files in both of them (if you have done everything correctly). Store these files somewhere on your computer and we will come back to these files in a later lecture.
+
+### Handoff to `phyloseq`
+
+Our next activity will be to hand off the data to the `phyloseq` package for analysis. This package requires three items: the "OTUtable," the taxonomy table, and data about the samples. The first two items are directly available at the end of your `dada2`run, and you can import the latter as a .csv file. In the case of the data that are considered here, we can calculate the derive the gender (G), mouse subject number (X), and day post-weaning (Y) directly from the file name, which has the form GXDY.
+
+```{r}
+# Create a data frame for the sample data
+samples.out <- rownames(seqtab.nochim)
+
+# Create subject, gender, and day variables
+subject <- sapply(strsplit(samples.out, "D"), `[`, 1)
+gender <- substr(subject,1,1)
+subject <- substr(subject, 2, 999)
+day <- as.integer(sapply(strsplit(samples.out, "D"), `[`, 2))
+
+# Combine into dataframe
+samdf <- data.frame(Subject = subject, Gender = gender, Day = day)
+
+#Create indicator of early or late day of post-weaning
+samdf$When <- "Early"
+samdf$When[samdf$Day > 100] <- "Late"
+
+# Assign rownames to the dataframe == these will be the same as the rownames of the "OTUtable"
+rownames(samdf) <- samples.out
+```
+
+Now that we have our sample data, let's create the phyloseq object.
+
+```{r}
+library(phyloseq)
+
+# Create phyloseq object
+ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE), 
+               sample_data(samdf),
+               tax_table(taxa),
+               phy_tree(fitGTR$tree))
+ps <- prune_samples(sample_names(ps) != "Mock", ps) #Remove mock sample
+# Describe it
+ps
+```
+
+So we are now ready to use `phyloseq`. I will show you a few things you can do with these data. In our next session I will show you much much more.
+
+### Diversity in Microbial Ecology
+
+A key concept in ecology in general, microbial ecology and microbiome research in particular is that of *diversity.* Often the term "species diversity" is used, although sometimes we do not have species level resolution to the species level. We can conceive of diversity at each taxonomic level, that is, genus diversity, family diversity, etc.
+
+Whatever the level, the term $\alpha$-diversity is used to denote diversity in an individual setting. In microbiome studies, this typically means for each experimental unit measured, that is, person, animal, etc., the diversity within that experimental unit. Diversity at this level consists of two parts: *richness* and *evenness*. 
+
+- _Richness_: How many different types of units (e.g., species) are there?
+- _Evenness_: How equal are the abundances of the different types?
+
+Richness is a simple count. 
+
+There are several different measures of evenness. One common measure is the *Shannon Index* defined as 
+
+\begin{equation}
+H=-\sum_{i=1}^R p_i ln(p_i)
+\end{equation}
+
+Where R is the number of different types of units, and $p_i$ is the proportion of units in type $i$. When all types are equally common, then $p_i=R, \all i$, and H = ln(R). If one type dominates at the expense of all others, then H --> 0. If there is only one type present, then H = 0.
+
+Another common measure is the *Simpson Index* defined as 
+
+\begin{equation}
+\lambda = \sum_{i=1}^R p_i^2
+\end{equation}
+
+When all types are equally abundant, then $\lambda = 1/R$, and if one types dominates then $\lambda$ --> 1.
+
+Let's see what these animals look like interms of individual $\alpha$-diversity measures.
+
+```{r}
+# Plot alpha-diversity
+plot_richness(ps, x="Day", measures = c("Shannon", "Simpson"), color = 
+                "When")  +
+        theme_bw()
+```
+
+### Ordinate
+
+Another type of diversity is that between units: how dissimilar or different are they? Ecologists will do what is called *ordination* in which they will assess distances or dissimilarities between individuals, then describe the variability in those assessments. Recall our last lesson in which we talked about non-metrical Multidimensional Scaling (nMDS). This is just one applicaiton of nMDS.
+
+Let's see how these fall when we ordinate using the Bray-Curtis dissimilarity index.
+
+First let's transform data to proportions, which is appropriate for Bray-Curtis distances.
+
+```{r}
+
+ps.prop <- transform_sample_counts(ps, function(otu) otu/sum(otu))
+
+```
+
+Now let's ordinate and plot:
+
+```{r}
+# Ordinate with Bray-Curtis
+
+ord.nmds.bray <- ordinate(ps.prop, method="NMDS", distance="bray")
+plot_ordination(ps, ord.nmds.bray, color="When", title="Bray NMDS")
+```
+
+We see that ordination picks out a separation between the early and late samples.
+
+### Bar Plots   
+
+Another common practice in microbiome research is to determine the top N categories at some taxonomic level. One of my collaborators calls this the production of the "Greatest Hits."
+
+Let's pick out the top 20 OTUs, then see how they fall in individuals, colored by Family, and grouped by early or late.
+
+```{r}
+# Create bar plots for top 20 OTUs
+
+top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:20]
+ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
+ps.top20 <- prune_taxa(top20, ps.top20)
+p <- plot_bar(ps.top20, x="Day", fill="Family") + facet_wrap(~When, scales="free_x")
+p
+ggsave("~/Documents/NRSG_741/MiSeqData/ps barplot based on DECIPHER.png", plot = p, width = 6, height = 8, unit = "in")
+```
+
+That wraps it up for today. Next week we will show more `phyloseq` and then get into functional predictions.

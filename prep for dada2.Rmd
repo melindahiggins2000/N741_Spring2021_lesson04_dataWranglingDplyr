@@ -1,0 +1,81 @@
+---
+title: "Prepping for dada2"
+author: "Vicki Hertzberg"
+date: "2/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+To work along with the dada2 lecture on 3/3, you will need to install a number of programs. Most of these come from Bioconductor.
+
+You will need the following programs from CRAN:
+
+ggplot2
+
+You will need to install the following programs from Bioconductor:
+
+dada2
+phyloseq
+ShortRead
+DECIPHER
+
+To install a program from Bioconductor, you will first need to install Bioconductor. To do this, execute the following code IN THE CONSOLE WINDOW:
+
+
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version = "3.12")
+
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version = "3.12")
+```
+
+
+
+
+Next install the other programs. For instance to install dada2, use the following code:
+
+```{r}
+
+#Remove comment symbol from next line for it to work. I am keeping the next line commented, however, because I do not need to install dada2, it is already installed.
+
+#BiocManager::install("dada2")
+
+```
+
+To install the other programs, use a similar chunk of code, this time substituting the package name for dada2.
+
+Next check on the package version of all of the programs you have installed:
+
+```{r}
+
+packageVersion("ggplot2")
+packageVersion("dada2")
+packageVersion("DECIPHER")
+packageVersion("ShortRead")
+packageVersion("ggplot2")
+
+```
+
+There are some other files you will need to download.
+
+First you wil need to download the mothur MiSeq SOP dataset that you can find at http://mothur.s3.us-east-2.amazonaws.com/wiki/miseqsopdata.zip
+
+Unzip this download and store the folder on your hard drive (not your desktop), and remember the path to it. You should have 45 files. 
+
+Also, go to https://zenodo.org/record/3986799#.YC7mEi2cbUI and downlod the silva_nr99_v138_train_set.fa.gz, the silva_nr99_v138_wSpecies_train_set.fa.gz, and the silva_species_assignment_v138.fa.gz files. 
+
+Store these files in the same place where you are storing the mothur example dataset. DO NOT UNZIP.
+
+We are now ready to take on dada2 on 3/3/21.
+
+
+
